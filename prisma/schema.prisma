@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int           @id @default(autoincrement())
+  displayName      String        @map("display_name")
+  email            String        @unique
+  googleId         String?       @unique @map("google_id")
+  hashedPassword   String?       @map("hashed_password")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  comments         Comment[]
+  posts            Post[]
+  postLikes        PostLike[]
+  commentLikes     CommentLike[]
+  followers        Follow[]      @relation("UserFollowers")
+  following        Follow[]      @relation("UserFollowing")
+  sentMessages     Message[]     @relation("sentMessages")
+  receivedMessages Message[]     @relation("receivedMessages")
+  profile          Profile?
+  setting          UserSetting?
+
+  @@map("user")
+}
+
+model Profile {
+  id             Int      @id @default(autoincrement())
+  bio            String?
+  profilePicture String?
+  website        String?
+  github         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  userId         Int      @unique
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@map("profile")
+}
+
+model UserSetting {
+  id         Int     @id @default(autoincrement())
+  isDarkMode Boolean @default(true)
+  userId     Int     @unique
+  user       User    @relation(fields: [userId], references: [id])
+
+  @@map("user_setting")
+}
+
+//TODO notification model
+//receiverID
+// senderID? who gave the notification
+//postId?
+//commentId?
+//messageId?
+//isRead
+
+model Post {
+  id         Int        @id @default(autoincrement())
+  body       String     @default("")
+  gitLink    String?
+  repoLink   String?
+  attachment String?
+  createdAt  DateTime   @default(now())
+  nextPostId Int?
+  nextPost   Post?      @relation("PostSequal", fields: [nextPostId], references: [id], onDelete: SetNull)
+  prevPost   Post[]     @relation("PostSequal")
+  author     User       @relation(fields: [userId], references: [id], onDelete: Cascade) //deleting user deletes all their posts
+  userId     Int
+  tags       Tag[]
+  likes      PostLike[]
+  comments   Comment[]
+
+  @@map("post")
+}
+
+model Comment {
+  id              Int           @id @default(autoincrement())
+  body            String
+  createdAt       DateTime      @default(now())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          Int
+  likes           CommentLike[]
+  parentCommentId Int?
+  parentComment   Comment?      @relation("CommentParent", fields: [parentCommentId], references: [id])
+  childComment    Comment[]     @relation("CommentParent")
+  postId          Int
+  post            Post          @relation(fields: [postId], references: [id], onDelete: Cascade) //deleting post deletes all comments
+
+  @@map("comments")
+}
+
+model PostLike {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId Int
+
+  @@unique([userId, postId])
+  @@map("post_likes")
+}
+
+model CommentLike {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId Int
+
+  @@unique([userId, commentId])
+  @@map("comment_likes")
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  posts Post[]
+
+  @@map("tag")
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  content    String
+  createdAt  DateTime @default(now())
+  senderId   Int
+  receiverId Int
+  sender     User     @relation("sentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("receivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("message")
+}
+
+//Dont need this, but this is an explicit relation table that would automatically be created
+// by prisma if i didnt define the self many-to-many relationship between users
+// i made my own so i could specify the created at 
+model Follow {
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId Int
+  followerId  Int
+  createdAt   DateTime @default(now())
+
+  @@id([followerId, followingId], name: "id")
+  @@map("follow")
+}
+
+//Didnt add relation table for Many-to-many POST-TAGS
