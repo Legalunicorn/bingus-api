@@ -71,7 +71,6 @@ exports.createPost = [
     
     asyncHandler(async(req,res,next)=>{
 
-        //BUG tags are optional
         const body = req.body.body;
         //handle tags if it exists
         const createdTags = await (req.body.tags? upsert_tags(req.body.tags): undefined)
@@ -143,7 +142,6 @@ exports.updatePost = [
     validationHandle,
 
     asyncHandler(async(req,res,next)=>{
-        //TODO confirm if we have checked that post exists
         //you can only update the body and tags 
         // 1. get the post, set the data if the post is there
         const postId = req.params.postId;
@@ -162,3 +160,38 @@ exports.updatePost = [
     })
         
 ]
+
+exports.likePost = asyncHandler(async(req,res,next)=>{
+    //check if post exist //TODO make exist a middleware
+    const postId = Number(req.params.postId)
+    const exist = await prisma.post.findUnique({where:{id:postId}})
+    if (!exist) return res.status(404).json({error:`Post ${postId} does not exist`});
+    const result = await prisma.postLike.upsert({
+        where:{
+            userId:req.user.id,
+            postId
+        },
+        update:{},
+        create:{
+            userId:req.user.id,
+            postId
+
+        }
+    })
+    res.status(200).json({result})
+ })
+
+
+ exports.unlikePost =asyncHandler(async(req,res,next)=>{
+    const postId = Number(req.params.postId)
+    const exist = await prisma.post.findUnique({where:{id:postId}})
+    if (!exist) return res.status(404).json({error:`Post ${postId} does not exist`});
+    const result = await prisma.postLike.deleteMany({
+        where:{
+            userId:req.user.id,
+            postId
+        }
+    })
+    console.log("deleted res",result);
+    return res.status(200).json({result});
+ })

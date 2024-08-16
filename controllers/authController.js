@@ -18,8 +18,12 @@ exports.googleRedirectGet = (req,res,next)=>[
     (req,res,next)=>{
         const user = req.user;
         //TODO -> check if the user has a username
+
+        //TODO for now, i dont have a frontend to creat username
+        //generate a random one for new users first, then decide later
         if (!user.username){
             return res.redirect("-set-username-form")
+            //username form to point back to different endpoint
         }
         // if they do not redirect the register for username page"
         // then we no longer need to store the email of the user

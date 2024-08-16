@@ -32,6 +32,15 @@ router.patch(":/postId",
     controller.updatePost
 )
  
+router.post(":/postId/like",
+    requireAuth,
+    controller.likePost
+    
+)
+router.post(":/postId/unlike",
+    requireAuth,
+    controller.unlikePost
+)  
 
 
 module.exports = router;
