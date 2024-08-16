@@ -45,7 +45,8 @@ export async function user_posts(id){
             },
             author:{
                 select:{
-                    displayName,
+                    displayName:true,
+                    username:true,
                     profile:{
                         select:{
                             profilePicture:true,
@@ -99,6 +100,7 @@ export async function get_post(id){ //TODO confirm if this shit works
                                 }
                             },
                             _count:{
+                                //BUG Might want to not do this, save following/followers for viewing user profile instead
                                 select:{
                                     followers:true,
                                     following:true

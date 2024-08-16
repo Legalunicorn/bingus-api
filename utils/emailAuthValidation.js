@@ -5,7 +5,7 @@ const myError = require("../lib/myError")
 
 
 /*
--> displayName
+-> username
 -> email 
 -> password
 */
@@ -26,7 +26,9 @@ export async function emailLoginValidation(email,password){
 
 }
 
-export async function  emailSignupValidation(displayName,email,password){
+
+//TODO change displayName to username 
+export async function  emailSignupValidation(username,email,password){
     //make sure email is unique
     const exist = await prisma.user.findUnique({where:{email:email}})
     if (exist) throw new myError("Username has already been taken",409) //conflict
@@ -34,7 +36,7 @@ export async function  emailSignupValidation(displayName,email,password){
         try{
             const user = await prisma.user.create({
                 data:{
-                    displayName,
+                    username,
                     email,
                     password: encryptPassword(password)
                 }

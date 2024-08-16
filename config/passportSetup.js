@@ -4,7 +4,9 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const {PrismaClient} = require("@prisma/client")
 const prisma = new PrismaClient();
 
-
+//TODO update the OAuth Flow
+// I want to Enforce unique usernames
+// if its a new google account -> redirect to frontend to create a username first
 passport.use(
         new GoogleStrategy({
         callbackURL:`${process.env.API_URL}/api/auth/google/redirect`,
@@ -16,7 +18,6 @@ passport.use(
             try{
             //for now we ignore the access and refresh token
 
-                //TODO profile.image.url -> set this
                 const googleId = profile.id;
                 const displayName = profile.displayName
                 const email = profile.emails[0].value;
@@ -37,11 +38,14 @@ passport.use(
                 }
 
                 //Completely new user
+
+                //BUG NO USERNAME, make sure to check in call back
                 const newUser = await prisma.user.create({
                     displayName,
                     email,
                     googleId
                 })
+
                 return done(null,newUser)
 
             } catch(err){

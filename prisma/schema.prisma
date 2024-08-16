@@ -8,14 +8,21 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   output="../ERD.pdf"
+// }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  
 }
 
 model User {
   id               Int           @id @default(autoincrement())
   displayName      String        @map("display_name")
+  username         String?       @unique
   email            String        @unique
   googleId         String?       @unique @map("google_id")
   hashedPassword   String?       @map("hashed_password")
@@ -37,8 +44,9 @@ model User {
 
 model Profile {
   id             Int      @id @default(autoincrement())
-  bio            String?
+  bio            String   @default("")
   profilePicture String?
+  pfp_public_id  String?
   website        String?
   github         String?
   createdAt      DateTime @default(now())
@@ -72,7 +80,7 @@ model Post {
   gitLink    String?
   repoLink   String?
   attachment String?
-  public_d   String? //for attachment id on cloudinary
+  public_id  String? //for attachment id on cloudinary
   createdAt  DateTime   @default(now())
   nextPostId Int?
   nextPost   Post?      @relation("PostSequal", fields: [nextPostId], references: [id], onDelete: SetNull)

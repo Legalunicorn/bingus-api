@@ -17,10 +17,16 @@ exports.googleRedirectGet = (req,res,next)=>[
     passport.authenticate('google',{session:false}),
     (req,res,next)=>{
         const user = req.user;
+        //TODO -> check if the user has a username
+        if (!user.username){
+            return res.redirect("-set-username-form")
+        }
+        // if they do not redirect the register for username page"
+        // then we no longer need to store the email of the user
         const token = generateToken(user.id);
         console.log("====== google redirect =====")
         //have to hardcode a redirect url
-        res.redirect(`${process.env.CLIENT_URl}?token=${token}%displayName=${user.displayName}`)
+        res.redirect(`${process.env.CLIENT_URl}?token=${token}%username=${user.username}`)
         
     }
 ]
@@ -43,7 +49,7 @@ exports.loginPost = [
         const token = generateToken(user.id);
         res.status(200).json({
             token,
-            displayName
+            username: user.username
         })
     })
 ]
@@ -52,12 +58,12 @@ exports.signupPost=[
     body("email","Invalid email")
         .trim()
         .isEmail(),
-    body("displayName")
+    body("username")
         .trim()
         .isLength({min:2,max:35})
-        .withMessage("Displayname betwen 2-35 characters")
-        .matches(/^[a-ZA-Z0-9_. ']*$/)
-        .withMessage("DisplayName characters must be either alphanumeric, a period, space, or underscore"),
+        .withMessage("Username betwen 2-35 characters")
+        .matches(/^[a-ZA-Z0-9_.]*$/)
+        .withMessage("Username characters must be either alphanumeric, a period, or underscore"),
     body("password")
         .trim()
         .isLength({min:2,max:35})
@@ -66,12 +72,12 @@ exports.signupPost=[
     validationHandle,
 
     asyncHandler(async(req,res,next)=>{
-        const {displayName,email,password} = req.body;
-        const user = await emailSignupValidation(displayName,email,password)
+        const {username,email,password} = req.body;
+        const user = await emailSignupValidation(username,email,password)
         const token = generateToken(user.id)
         res.status(200).json({
             token,
-            displayName
+            username
         })
     })
 

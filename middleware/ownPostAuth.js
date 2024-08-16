@@ -33,7 +33,7 @@ const ownPostAuth = [
 
         req.params.postId = Number(req.params.postId) //dont have to do this in controller endpoint
         //Put post in request
-        req.post = post;
+    req.post = post;    
         next(); //sucessful
 
     })

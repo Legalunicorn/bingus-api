@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 const validationHandle = require("../middleware/validationHandle")
 const upload = require("../config/multer");
 const { uploadStream, deleteFile } = require("../utils/cloudinaryUtil");
+const multerCheckFile = require("../middleware/multerCheckFile");
 
 
 exports.getManyPosts = asyncHandler(async(req,res,next)=>{
@@ -66,15 +67,8 @@ exports.createPost = [
         .isURL(),
     
     validationHandle,
-
-    //Multer Handle upload only if file is pressent
-    (req,res,next)=>{
-        if (req.file!==undefined){
-            //call multer middleware
-            upload.single("attachment") 
-        } else next(); //skip
-    },
-
+    multerCheckFile,
+    
     asyncHandler(async(req,res,next)=>{
 
         //BUG tags are optional
@@ -149,6 +143,7 @@ exports.updatePost = [
     validationHandle,
 
     asyncHandler(async(req,res,next)=>{
+        //TODO confirm if we have checked that post exists
         //you can only update the body and tags 
         // 1. get the post, set the data if the post is there
         const postId = req.params.postId;

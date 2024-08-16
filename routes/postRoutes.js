@@ -6,8 +6,7 @@ const ownPostAuth = require("../middleware/ownPostAuth")
 //Get all POST by recency, OPTIONAL: user
 router.get("/:userId?",controller.getManyPosts)
 
-
-// GET a single POST
+// GET a single POST, for everyone 
 router.get("/:postId",controller.getPost)
 
 // GET a post by users who userId is followingo
@@ -15,7 +14,6 @@ router.get("/following",
     requireAuth,
     controller.getFollowingPosts
 )
-
 // POST a new post
 router.post("/",
     requireAuth,
@@ -29,7 +27,10 @@ router.delete("/:postId",
 )
 
 // UPDATE a post
-router.patch(":/postId")
+router.patch(":/postId",
+    ownPostAuth,
+    controller.updatePost
+)
  
 
 
