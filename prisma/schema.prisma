@@ -4,14 +4,13 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-// generator erd {
-//   provider = "prisma-erd-generator"
-//   output="../ERD.pdf"
+// generator client {
+//   provider = "prisma-client-js"
 // }
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
 
 datasource db {
   provider = "postgresql"

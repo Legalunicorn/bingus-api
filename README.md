@@ -1,4 +1,8 @@
 
+
+## ERD
+![erd](/public/images/ERD.png)
+## API
 #### Auth
 
 - [x] `/auth/local/email` __POST__
