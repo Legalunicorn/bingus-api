@@ -1,62 +1,54 @@
-## API Progress
+
 #### Auth
 
-- [x] `/auth/local/email` POST
-- [x] `/auth/local/signup` POST
-- [x] `/auth/google/` GET
-- [x] `/auth/google/redirect` GET
-- [ ] Handle the setting username logic
+- [x] `/auth/local/email` __POST__
+- [x] `/auth/local/signup` __POST__
+- [x] `/auth/google/` __GET__
+- [x] `/auth/google/redirect` __GET__
+- [ ] Handle the setting username redirect logic
 
 
 #### Post
-- [x] `/posts/:userId?` ==GET== 
+- [ ] `/posts/:userId?` __GET__ 
       get posts by everyone or by one user
-- [x] `/posts/following` ==GET== 
+- [ ] `/posts/following` __GET__ 
 	get post only by users who userId is following
-- [x] `/posts/:postId` ==GET==
-- [ ] `/posts` ==POST== (half done)
+- [x] `/posts/:postId` __GET__
+- [x] `/posts` __POST__== 
 	 create a new post
 	body
 		body
 		tags
 	headers
 		- [ ] Bearer Token
-- [x] `/posts/:postId` ==DELETE==
-- [x] `/posts/:postId` ==PATCH==
-- [x] `/posts/:postId/like` ==POST== 
-- [x] `/posts/:postId/unlike` ==POST== 
+- [x] `/posts/:postId` __DELTE__
+- [x] `/posts/:postId` __PATCH__
+- [x] `/posts/:postId/like` __POST__
+- [x] `/posts/:postId/unlike` __POST__
 - [ ] LINK parent post to olde post
 
 //should like be in its own controller?
 
 #### User
-- [x] `/users` ==GET== 
-- [x] `/users/:userId` ==GET== 
-- [x] `/users/:userId/bio` ==PATCH==
-- [x] `/users/:userId/settings` ==PATCH==
-- [x] `/users/:userId` ==DELETE==
-- [x] `/users/:userId/follow` ==POST==
-- [x] `/users/:userId/unfollow` ==POST==
-- [x] `/users/:userId/followers` ==GET==
-- [x] `/users/:userId/folllowing` ==GET==
-- [ ] `/users/:userId/comments`
-- [ ] `/users/:userId/posts` (? why is this not a feature -> i already get all posts from the /users/:userId)
+- [x] `/users` __GET__ 
+- [x] `/users/:userId` __GET__
+- [x] `/users/:userId/bio` __PATCH__
+- [x] `/users/:userId/settings` __PATCH__
+- [x] `/users/:userId` __DELETE__
+- [x] `/users/:userId/follow` __POST__
+- [x] `/users/:userId/unfollow` __POST__
+- [x] `/users/:userId/followers` __GET__
+- [x] `/users/:userId/folllowing` __GET___
+%% - [ ] `/users/:userId/comments`
+- [ ] `/users/:userId/posts` (? why is this not a feature -> i already get all posts from the /users/:userId) %%
 
 #### Comment
-- [ ] `/comments/:commentId` ==GET== (What is the point of this?)
-      get a single comment 
-- [ ] `/comments/:userId` ==GET== (Actually i dont know if i need this)
-      get all comments by a user
-- [ ] `/comments/:postId` 
-      (Do i need this?? i already retreive all) comments from a post using /posts/postId)
-      get all comments in a post
-	      -> including the SUB-comments 
-- [x] `/comments/:commentId/like` ==PUT==
-- [x] `/comments/:commentId` ==DELETE==
+- [x] `/comments/:commentId/like` __PUT__
+- [x] `/comments/:commentId` __DELETE__
       delete a comment
-- [ ] `/comments/` POST
-- [ ] /commentid/like
-- [ ] commentid/unlike
+- [ ] `/comments/` __POST__
+- [ ] `/comments/:commentId/like` **POST**
+- [ ] `/comments/:commentId/unlike` **POST**
 
 #### Tags
 - [x] -> get all post by tags
@@ -70,3 +62,14 @@
 - [ ] `/notifications` GET
 - [ ] `/notificatinons/:notificationId/` PATCH 
 - [ ] `/notifications/` PATCH (clear all notifics)
+
+%% ## Featues tested
+- [ ] register with email
+- [ ] login with email
+- [ ] login with google oauth
+
+- [ ] get all posts by all users
+- [ ] get posts by following
+- [ ] get a single post
+- [ ] create a new post
+snippets %%
