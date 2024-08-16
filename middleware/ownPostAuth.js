@@ -9,6 +9,11 @@ const prisma = new PrismaClient();
  * verify request is from authenticated user
  * verifiy request is authorised (owner of post etc)
  * Parse the id of the post to Number() back into request
+ * 
+ * 
+ * 
+ * NEW FEATURE
+ * -> since the post is found, just pass it in the req.body or something
  */
 const ownPostAuth = [
     requireAuth,
@@ -27,6 +32,8 @@ const ownPostAuth = [
         }
 
         req.params.postId = Number(req.params.postId) //dont have to do this in controller endpoint
+        //Put post in request
+        req.post = post;
         next(); //sucessful
 
     })

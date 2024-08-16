@@ -5,6 +5,8 @@ const { body } = require("express-validator");
 const { upsert_tags } = require("../prisma/tagQueries");
 const prisma = new PrismaClient();
 const validationHandle = require("../middleware/validationHandle")
+const upload = require("../config/multer");
+const { uploadStream, deleteFile } = require("../utils/cloudinaryUtil");
 
 
 exports.getManyPosts = asyncHandler(async(req,res,next)=>{
@@ -65,6 +67,14 @@ exports.createPost = [
     
     validationHandle,
 
+    //Multer Handle upload only if file is pressent
+    (req,res,next)=>{
+        if (req.file!==undefined){
+            //call multer middleware
+            upload.single("attachment") 
+        } else next(); //skip
+    },
+
     asyncHandler(async(req,res,next)=>{
 
         //BUG tags are optional
@@ -75,19 +85,25 @@ exports.createPost = [
         const barePost = await create_post(body,req.user.id,createdTags)
         
         //3. get optional values and update
-        if (req.body.attachment){
-            //Do the multer and cloudinary nonsense here,
-            // then link the attachment to the post
+        if (req.file){
+            console.log("FILE:",req.file);
+            const result = await uploadStream(req.file.buffer);
+            console.log("RESULT: ",result);
+            barePost.attachment = result.secure_url;
+            barePost.public_id = result.public_id;
         }
-        if (req.body.gitLink) post.gitLink = req.body.gitLink
-        if (req.body.repoLink) post.repoLink = req.body.repoLink
+        if (req.body.gitLink) barePost.gitLink = req.body.gitLink
+        if (req.body.repoLink) barePost.repoLink = req.body.repoLink
         
+        //BUG - this uploads in two request (3 counting tags), using some JS operators, you can upload
+        // in two steps instead, just include the optinal values in the uploadQuery, then
+        // you dont have to update
         const post = await prisma.post.update({ //3. fill in optinal values and update (?)
             where:{
                 id:barePost.id
             },
             data:{
-                barePost
+                barePost //none after other table records, we can just do this
             }
         })
         res.status(200).json({post}) 
@@ -97,8 +113,20 @@ exports.createPost = [
 exports.deletePost = asyncHandler(async(req,res,next)=>{
     //Middleware has checked the req.user is the owner of postId
     const postId = req.params.postId;
-    const post = await delete_post(postId)
-    res.status(200).json({post})
+    const post = req.post;
+    if (post.attachment && post.public_id){ //not null
+        const [file,result] = await Promise.all([
+            delete_post(postId),
+            deleteFile(post.public_id)
+        ])
+        console.log("Result from cloudinary file deletion: ",result)
+        return res.status(200).json({file});
+    } else{ //no need to delete from cloudinary
+        const file = await delete_post(postId);
+        return res.status(200).json({file});
+    }
+
+
 })
 
 exports.updatePost = [
