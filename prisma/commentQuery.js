@@ -22,7 +22,6 @@ export async function create_comment(userId,body,parentCommentId){
                             profilePicture:true
                         }
                     }
-
                 }
             },
             _count:{

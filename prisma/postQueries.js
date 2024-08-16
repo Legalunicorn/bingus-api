@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 export async function all_posts(){
     const posts = await prisma.post.findMany({ //TODO narrow down the selects
-        include:{ //not sure what this is
+        include:{//bug change this to select 
             _count:{
                 select:{
                     likes:true,
@@ -15,7 +15,7 @@ export async function all_posts(){
             },
             author:{
                 select:{
-                    displayName,
+                    username:true,
                     profile:{
                         select:{
                             profilePicture:true,
