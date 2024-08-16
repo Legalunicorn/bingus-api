@@ -65,6 +65,8 @@ export async function user_posts(id){
     return posts;
 }
 
+
+//TODO, include all child comments as comments too!
 export async function get_post(id){ //TODO confirm if this shit works
     const post = await prisma.post.findUnique({
         where:{
@@ -82,8 +84,10 @@ export async function get_post(id){ //TODO confirm if this shit works
                     name:true
                 }
             },
+            //BUG, this will select all child comment as main comment as well!
             comments:{
-                select:{
+                where:{parentCommentId:null},
+                select:{//==
                     body:true,
                     createdAt:true,
                     _count:{
@@ -93,22 +97,38 @@ export async function get_post(id){ //TODO confirm if this shit works
                     },
                     user:{
                         select:{
-                            displayName:true,
+                            id:true,
+                            username:true,
                             profile:{
                                 select:{
                                     profilePicture:true,
                                 }
                             },
+                        }
+                    },
+                    childComment:{
+                        select:{
+                            body:true,
+                            createdAt:true,
+                            parentCommentId:true,
                             _count:{
-                                //BUG Might want to not do this, save following/followers for viewing user profile instead
                                 select:{
-                                    followers:true,
-                                    following:true
+                                    likes:true
+                                }
+                            },
+                            user:{
+                                select:{
+                                    displayName: true,
+                                    profile:{
+                                        select:{
+                                            profilePicture:true
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                }
+                }//==
             }
         }
     })
