@@ -4,14 +4,16 @@ const router = express.Router();
 const authRoutes = require("./authRoutes")
 const postRoutes = require("./postRoutes")
 const userRoutes = require("./userRoutes")
+const tagRoutes = require("./tagRoutes")
+const commentRoutes = require("./commentRoutes")
 
 
 
 router.use("/auth",authRoutes)
 router.use("/posts",postRoutes)
 router.use("/users",userRoutes)
-//Apply all the main routes
-//then export to app.js
+router.use("/tags",tagRoutes)
+router.use("/comments",commentRoutes)
 
 
 module.exports = router

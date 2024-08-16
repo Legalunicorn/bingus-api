@@ -64,3 +64,32 @@ exports.deleteComment = asyncHandler(async(req,res,next)=>{
     })
     return res.status(200).json({comment});
 })
+
+
+exports.postCommentLike = asyncHandler(async(req,res,next)=>{
+    const commentId = req.comment.id;
+    const result = await prisma.commentLike.upsert({
+        where:{
+            userId:req.user.id,
+            commentId
+        },
+        update:{},
+        create:{
+            userId:req.user.id,
+            commentId
+        }
+    })
+    res.status(200).json({result})
+})
+
+exports.postCommentUnlike = asyncHandler(async(req,res,next)=>{
+    const commentId = req.comment.id;
+    const result = await prisma.commentLike.deleteMany({
+        where:{
+            userId:req.user.id,
+            commentId
+        },
+    })
+    console.log("deleted:",result)
+    res.status(200).json({result})
+})

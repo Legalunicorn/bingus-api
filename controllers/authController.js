@@ -1,5 +1,6 @@
 const asyncHandler = require("express-asyc-handler")
-const passport = require("passport")
+// const passport = require("passport")
+const passport = require("../config/passportSetup")
 const { generateToken } = require("../utils/jwtUtil")
 const { default: validationHandle } = require("../middleware/validationHandle")
 const { emailLoginValidation, emailSignupValidation } = require("../utils/emailAuthValidation")
