@@ -8,6 +8,7 @@ const validationHandle = require("../middleware/validationHandle")
 const upload = require("../config/multer");
 const { uploadStream, deleteFile } = require("../utils/cloudinaryUtil");
 const multerCheckFile = require("../middleware/multerCheckFile");
+const myError = require("../lib/myError");
 
 
 exports.getManyPosts = asyncHandler(async(req,res,next)=>{
@@ -121,6 +122,36 @@ exports.deletePost = asyncHandler(async(req,res,next)=>{
 
 
 })
+
+
+exports.patchPostLink = [
+    body("parentPostId")
+        .trim()
+        .isInt(),
+
+    validationHandle,
+    asyncHandler(async(res,res,next)=>{
+        //OwnpostAuth -> verifies post is own by User + post exists
+        //Check the parent post is an actual post
+        const parentId = req.body.parentPostId
+        const parentExist = await prisma.post.findUnique({where:{id:parentId}})
+        //i can instead use connect and make 1 query instead of 2
+        //however the error will be thrown by prisma and might be confusing 
+        if (!parentExist) throw new myError(`Parent ID ${parentId} does not exist`,400);
+        const updatedPost = await prisma.post.update({
+            where:{id:req.post.id},
+            data:{
+                nextPostId:parentId
+            },
+            select:{
+                id:true,
+            }
+        })
+        res.status(200).json({postId:updatedPost.id});
+
+        //Update
+    })
+]
 
 exports.updatePost = [
     body("body")

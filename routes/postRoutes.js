@@ -26,6 +26,11 @@ router.delete("/:postId",
     controller.deletePost
 )
 
+router.patch("/:postId",
+    ownPostAuth,
+    controller.patchPostLink
+)
+
 // UPDATE a post
 router.patch(":/postId",
     ownPostAuth,
