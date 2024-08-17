@@ -3,24 +3,17 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs")
 const myError = require("../lib/myError")
 
-
-/*
--> username
--> email 
--> password
-*/
-
-export async function emailLoginValidation(email,password){
+export async function usernameLoginValidation(username,password){
     try{
-        const user = await prisma.user.findUnique({where:{email}});
+        const user = await prisma.user.findUnique({where:{username}});
         if (!user || !bcrypt.compareSync(password,user.hashedPassword)){
-            throw new myError("Password or Email is incorrect",401);
+            throw new myError("Password or Username is incorrect",401);
         }
         return user;
 
         
     }catch(err){
-        console.log("ERR: email login validation")
+        console.log("ERR: username login validation")
         console.log(err)
     }
 
@@ -28,23 +21,23 @@ export async function emailLoginValidation(email,password){
 
 
 //TODO change displayName to username 
-export async function  emailSignupValidation(username,email,password){
+export async function  usernameSignupValidation(username,displayName,password){
     //make sure email is unique
-    const exist = await prisma.user.findUnique({where:{email:email}})
+    const exist = await prisma.user.findUnique({where:{username}})
     if (exist) throw new myError("Username has already been taken",409) //conflict
     else{
         try{
             const user = await prisma.user.create({
                 data:{
                     username,
-                    email,
+                    displayName,
                     password: encryptPassword(password)
                 }
             })
             console.log("= New user created",user)
             return user;
         } catch(err){
-            console.log("ERR: email signup validation")
+            console.log("ERR: username signup validation")
             console.log(err)
         }
 

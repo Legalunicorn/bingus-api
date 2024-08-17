@@ -4,11 +4,11 @@ const passport = require("../config/passportSetup")
 const { generateToken } = require("../utils/jwtUtil")
 const { default: validationHandle } = require("../middleware/validationHandle")
 const {body} = require("express-validator")
-const { emailLoginValidation, emailSignupValidation } = require("../utils/emailAuthValidation")
 const myError = require("../lib/myError")
 const {PrismaClient} = require("@prisma/client")
 const prisma = new PrismaClient();
 const jwt = require("js")
+const { usernameSignupValidation, usernameLoginValidation } = require("../utils/emailAuthValidation")
 
 
 exports.googleGet = (req,res,next)=>{
@@ -90,7 +90,7 @@ exports.loginPost = [
 
     asyncHandler(async(req,res,next)=>{
         const {username,password} = req.body;
-        const user = await g(email,username); //BUG change to username validatoin
+        const user = await usernameLoginValidation(username,password)
         const token = generateToken(user.id);
         res.status(200).json({
             token,
@@ -100,9 +100,9 @@ exports.loginPost = [
 ]
 
 exports.signupPost=[
-    body("email","Invalid email")
+    body("displayName","Invalid display name")
         .trim()
-        .isEmail(),
+        .isLength({min:0,max:35}),
     body("username")
         .trim()
         .isLength({min:2,max:35})
@@ -117,8 +117,8 @@ exports.signupPost=[
     validationHandle,
 
     asyncHandler(async(req,res,next)=>{
-        const {username,email,password} = req.body;
-        const user = await emailSignupValidation(username,email,password)
+        const {username,displayName,password} = req.body;
+        const user = await usernameSignupValidation(username,displayName,password)
         const token = generateToken(user.id)
         res.status(200).json({
             token,

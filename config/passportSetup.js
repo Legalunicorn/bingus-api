@@ -4,7 +4,6 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const {PrismaClient} = require("@prisma/client")
 const prisma = new PrismaClient();
 
-//TODO update the OAuth Flow
 // I want to Enforce unique usernames
 // if its a new google account -> redirect to frontend to create a username first
 passport.use(
