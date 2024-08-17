@@ -1,8 +1,8 @@
 const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 
-export async function all_posts(){
-    const posts = await prisma.post.findMany({ //TODO narrow down the selects
+ async function all_posts(){
+    const posts = await prisma.post.findMany({ 
         include:{//bug change this to select 
             _count:{
                 select:{
@@ -31,8 +31,8 @@ export async function all_posts(){
     return posts;
 }
 
-export async function user_posts(id){
-    const posts = await prisma.post.findMany({ //TODO narrow down the selects
+ async function user_posts(id){
+    const posts = await prisma.post.findMany({ 
         include:{ //not sure what this is
             _count:{
                 select:{
@@ -66,8 +66,7 @@ export async function user_posts(id){
 }
 
 
-//TODO, include all child comments as comments too!
-export async function get_post(id){ //TODO confirm if this shit works
+ async function get_post(id){ 
     const post = await prisma.post.findUnique({
         where:{
             id
@@ -135,7 +134,7 @@ export async function get_post(id){ //TODO confirm if this shit works
     return post;
 }
 
-export async function get_following_posts(userId){
+ async function get_following_posts(userId){
     const posts = await prisma.post.findMany({
         //the author of the post is being followed by x user Id
         where:{
@@ -176,7 +175,7 @@ export async function get_following_posts(userId){
     return posts
 }
 
-export async function create_post(body,userId,tags){
+ async function create_post(body,userId,tags){
 
     const post = await prisma.post.create({
         data:{
@@ -215,7 +214,7 @@ export async function create_post(body,userId,tags){
     return post
 }
 
-export async function delete_post(id){
+ async function delete_post(id){
     const post = await prisma.post.delete({
         where:{
             id
@@ -224,7 +223,7 @@ export async function delete_post(id){
     return post;
 }
 
-export async function update_post(id,postData,tags){
+ async function update_post(id,postData,tags){
     //should try to set tags regardless
     const post = await prisma.post.update({
         where:{
@@ -261,3 +260,13 @@ export async function update_post(id,postData,tags){
 
     
 }
+
+module.exports = {
+    all_posts,
+    user_posts,
+    get_post,
+    get_following_posts,
+    create_post,
+    delete_post,
+    update_post
+};

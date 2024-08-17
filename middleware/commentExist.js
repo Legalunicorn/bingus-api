@@ -1,6 +1,7 @@
 
-const asyncHandler = require("@prisma/client");
-const prisma = new asyncHandler.Prisma();
+const {PrismaClient} = require("@prisma/client");
+const prisma = new PrismaClient();
+const asyncHandler = require("express-async-handler")
 
 const commentExist = asyncHandler(async(req,res,next)=>{
     const id = Number(req.params.commentId);

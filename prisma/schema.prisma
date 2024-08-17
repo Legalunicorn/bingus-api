@@ -4,18 +4,17 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-// generator client {
-//   provider = "prisma-client-js"
-// }
-
-generator dbml {
-  provider = "prisma-dbml-generator"
+generator client {
+  provider = "prisma-client-js"
 }
+
+// generator dbml {
+//   provider = "prisma-dbml-generator"
+// }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  
 }
 
 model User {
@@ -101,7 +100,7 @@ model Comment {
   userId          Int
   likes           CommentLike[]
   parentCommentId Int?
-  parentComment   Comment?      @relation("CommentParent", fields: [parentCommentId], references: [id],onDelete: Cascade)
+  parentComment   Comment?      @relation("CommentParent", fields: [parentCommentId], references: [id], onDelete: Cascade)
   childComment    Comment[]     @relation("CommentParent")
   postId          Int
   post            Post          @relation(fields: [postId], references: [id], onDelete: Cascade) //deleting post deletes all comments

@@ -2,7 +2,7 @@ const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 
 
-export async function get_all_users(){
+ async function get_all_users(){
     //consider having an option for more user details,
     // such as followers or following
     const users = await prisma.user.findMany({
@@ -20,7 +20,7 @@ export async function get_all_users(){
     return users
 }
 
-export async function get_user_details(id){
+ async function get_user_details(id){
     const user = await prisma.user.findUnique({
         where:{id},
         select:{
@@ -90,15 +90,15 @@ async function followingOrfollowers(isFollowing,id){
 }
 
 
-export async function get_followers(id){
+ async function get_followers(id){
     return await followingOrfollowers(false,id);
 }
 
-export async function get_following(id){
+ async function get_following(id){
     return await followingOrfollowers(true,id);
 }
 
-export async function update_user(id,updateData){
+ async function update_user(id,updateData){
     return await prisma.user.update({
         where:{id},
         data:{
@@ -144,7 +144,7 @@ export async function update_user(id,updateData){
     })
 }
 
-export async function delete_user(id){
+ async function delete_user(id){
     return await prisma.user.delete({
         where:{
             id
@@ -154,3 +154,12 @@ export async function delete_user(id){
 
 
 //IDEA, maybe i should seperate json queries that are used commonly into their own variables
+
+module.exports = {
+    get_all_users,
+    get_user_details,
+    get_followers,
+    get_following,
+    update_user,
+    delete_user
+};

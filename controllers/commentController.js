@@ -3,7 +3,9 @@ const asyncHandler = require("express-async-handler");
 const { body,query } = require("express-validator");
 const myError = require("../lib/myError");
 const { create_comment } = require("../prisma/commentQuery");
+const { validationHandle } = require("../middleware/validationHandle");
 const prisma = new PrismaClient();
+
 
 exports.deleteComment = asyncHandler(async(req,res,next)=>{
     //User delete many to now throw error, we handle the error ourselves
@@ -31,6 +33,7 @@ exports.postComment = [
         .optional()
         .trim()
         .isNumeric(),
+    validationHandle,
 
     asyncHandler(async(req,res,next)=>{
         //Comment CAN have parentComment, but that parent comment cannot have parent comment

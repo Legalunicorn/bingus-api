@@ -3,7 +3,7 @@ const router = express.Router();
 
 const authRoutes = require("./authRoutes")
 const postRoutes = require("./postRoutes")
-const userRoutes = require("./userRoutes")
+// const userRoutes = require("./userRoutes")
 const tagRoutes = require("./tagRoutes")
 const commentRoutes = require("./commentRoutes")
 
@@ -11,7 +11,7 @@ const commentRoutes = require("./commentRoutes")
 
 router.use("/auth",authRoutes)
 router.use("/posts",postRoutes)
-router.use("/users",userRoutes)
+// router.use("/users",userRoutes)
 router.use("/tags",tagRoutes)
 router.use("/comments",commentRoutes)
 

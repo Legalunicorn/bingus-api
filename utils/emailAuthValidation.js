@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs")
 const myError = require("../lib/myError")
 
-export async function usernameLoginValidation(username,password){
+ async function usernameLoginValidation(username,password){
     try{
         const user = await prisma.user.findUnique({where:{username}});
         if (!user || !bcrypt.compareSync(password,user.hashedPassword)){
@@ -20,8 +20,7 @@ export async function usernameLoginValidation(username,password){
 }
 
 
-//TODO change displayName to username 
-export async function  usernameSignupValidation(username,displayName,password){
+ async function  usernameSignupValidation(username,displayName,password){
     //make sure email is unique
     const exist = await prisma.user.findUnique({where:{username}})
     if (exist) throw new myError("Username has already been taken",409) //conflict
@@ -49,4 +48,9 @@ function encryptPassword(password){
     const salt = bcrypt.genSaltSync(10); //random salt;
     const hash = bcrypt.hashSync(password,salt,null);
     return hash;
+}
+
+module.exports = {
+    usernameLoginValidation,
+    usernameSignupValidation
 }

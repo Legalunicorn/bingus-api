@@ -30,3 +30,5 @@ router.post("/:commentId:like",
     commentExist,
     controller.postCommentUnlike
 )
+
+module.exports = router

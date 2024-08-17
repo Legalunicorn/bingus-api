@@ -38,12 +38,11 @@ passport.use(
 
                 //Completely new user
 
-                //BUG NO USERNAME, make sure to check in call back
                 const newUser = await prisma.user.create({
                     displayName,
                     email,
                     googleId
-                })
+                })//will get handled in callback
 
                 return done(null,newUser)
 

@@ -1,15 +1,14 @@
-const asyncHandler = require("express-asyc-handler")
-// const passport = require("passport")
+const asyncHandler = require("express-async-handler")
 const passport = require("../config/passportSetup")
 const { generateToken } = require("../utils/jwtUtil")
-const { default: validationHandle } = require("../middleware/validationHandle")
+const {validationHandle} = require("../middleware/validationHandle")
 const {body} = require("express-validator")
 const myError = require("../lib/myError")
 const {PrismaClient} = require("@prisma/client")
 const prisma = new PrismaClient();
-const jwt = require("js")
 const { usernameSignupValidation, usernameLoginValidation } = require("../utils/emailAuthValidation")
 
+//BUG -> validationHandle
 
 exports.googleGet = (req,res,next)=>{
     const authenticator = passport.authenticate('google',{
@@ -18,13 +17,12 @@ exports.googleGet = (req,res,next)=>{
     authenticator(req,res,next);
 }
 
-exports.googleRedirectGet = (req,res,next)=>[
+exports.googleRedirectGet = [
     //Call passport.authenticate again but this time it has user
     passport.authenticate('google',{session:false}),
     (req,res,next)=>{
         const user = req.user;
         if (!user.username){
-            //TODO jwt token send must be temporary token that dies fast
             const token = generateToken(user.id,'10min') //
             return res.redirect(`${process.env.CLIENT_URL}/auth/set-username?token=${token}`)
             //username form to point back to different endpoint
@@ -32,16 +30,18 @@ exports.googleRedirectGet = (req,res,next)=>[
         //Already registered Gooogle account with username
         const token = generateToken(user.id);
         console.log("====== google redirect registered =====")
-        res.redirect(`${process.env.CLIENT_URl}?token=${token}%username=${user.username}`)
+        res.redirect(`${process.env.CLIENT_URL}?token=${token}%username=${user.username}`)
         
     }
 ]
+
+
 exports.setUsername = [
     body("username")
         .trim()
         .isLength({min:2,max:35})
         .withMessage("Username betwen 2-35 characters")
-        .matches(/^[a-ZA-Z0-9_.]*$/),
+        .matches(/^[a-zA-Z0-9_.]*$/),
     body("id")
         .isInt(),
 
@@ -60,7 +60,7 @@ exports.setUsername = [
 
         if (!existId) res.status(404).json({error:`user ${id} does not exist`})
         if (existUser) {
-            if (existUser.id==id) throw new Error("Username must be different",400)
+            if (existUser.id==id) throw new myError("Username must be different",400)
             else                  throw new myError("Username already exists",409);
         }
         // Success
@@ -86,7 +86,7 @@ exports.loginPost = [
         .isLength({min:2,max:35})
         .withMessage("Password must be between 2-35 characters long"),
 
-    validationHandle,
+    // validationHandle,
 
     asyncHandler(async(req,res,next)=>{
         const {username,password} = req.body;
@@ -107,7 +107,7 @@ exports.signupPost=[
         .trim()
         .isLength({min:2,max:35})
         .withMessage("Username betwen 2-35 characters")
-        .matches(/^[a-ZA-Z0-9_.]*$/)
+        .matches(/^[a-zA-Z0-9_.]*$/)
         .withMessage("Username characters must be either alphanumeric, a period, or underscore"),
     body("password")
         .trim()

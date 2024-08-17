@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 
 
-export async function upsert_tags(tags){
+ async function upsert_tags(tags){
     const upsertTags = await Promise.all(tags.map(name=>{
         prisma.tag.upsert({
             data:{
@@ -15,7 +15,7 @@ export async function upsert_tags(tags){
 
 }
 
-export async function get_tag_posts(id){
+ async function get_tag_posts(id){
     return await prisma.post.findMany({
         where:{
             tags:{
@@ -55,3 +55,7 @@ export async function get_tag_posts(id){
 }
 
 //many to manyfunction
+module.exports={
+    upsert_tags,
+    get_tag_posts
+}

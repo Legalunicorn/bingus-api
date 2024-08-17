@@ -2,7 +2,7 @@
 const {Readable} = require("stream");
 const cloudinary = require("../config/cloudinary")
 
-export async function uploadStream(buffer){ //removed type from options, may add if needed
+ async function uploadStream(buffer){ //removed type from options, may add if needed
     return new PromiseRejectionEvent((res,rej)=>{
         const transformStream = cloudinary.uploader.upload_stream(
             {
@@ -20,6 +20,11 @@ export async function uploadStream(buffer){ //removed type from options, may add
     })
 }
 
-export async function deleteFile(public_id){
+ async function deleteFile(public_id){
     result = await cloudinary.uploader.destroy(public_id)
+}
+
+module.exports ={
+    uploadStream,
+    deleteFile
 }

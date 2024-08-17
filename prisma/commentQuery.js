@@ -1,7 +1,7 @@
 const {PrismaClient} = require("@prisma/client")
 const prisma = new PrismaClient();
 
-export async function create_comment(userId,body,parentCommentId){
+ async function create_comment(userId,body,parentCommentId){
 
     return await prisma.comment.create({
         data:{
@@ -32,4 +32,8 @@ export async function create_comment(userId,body,parentCommentId){
         }
     })
 
+}
+
+module.exports ={
+    create_comment
 }

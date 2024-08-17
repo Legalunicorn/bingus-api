@@ -4,8 +4,7 @@ const {user_posts, all_posts, get_post, get_following_posts, create_post, delete
 const { body } = require("express-validator");
 const { upsert_tags } = require("../prisma/tagQueries");
 const prisma = new PrismaClient();
-const validationHandle = require("../middleware/validationHandle")
-const upload = require("../config/multer");
+const {validationHandle} = require("../middleware/validationHandle")
 const { uploadStream, deleteFile } = require("../utils/cloudinaryUtil");
 const multerCheckFile = require("../middleware/multerCheckFile");
 const myError = require("../lib/myError");
@@ -57,7 +56,8 @@ exports.createPost = [
         .withMessage("Text body must not be empty"),
     body("tags.*")
         .trim()
-        .escape(), //TODO see what this does
+        .toLowerCase(),
+        // .escape(), //TODO see what this does, how about no?
     body("gitLink")
         .optional()
         .trim()
@@ -130,7 +130,7 @@ exports.patchPostLink = [
         .isInt(),
 
     validationHandle,
-    asyncHandler(async(res,res,next)=>{
+    asyncHandler(async(req,res,next)=>{
         //OwnpostAuth -> verifies post is own by User + post exists
         //Check the parent post is an actual post
         const parentId = req.body.parentPostId
