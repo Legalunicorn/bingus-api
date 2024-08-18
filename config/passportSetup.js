@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // if its a new google account -> redirect to frontend to create a username first
 passport.use(
         new GoogleStrategy({
-        callbackURL:`${process.env.API_URL}/api/auth/google/redirect`,
+        callbackURL:`${process.env.API_URL}/api/auth/oauth/google/redirect`,
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET
         },
@@ -39,9 +39,11 @@ passport.use(
                 //Completely new user
 
                 const newUser = await prisma.user.create({
-                    displayName,
-                    email,
-                    googleId
+                    data:{
+                        displayName,
+                        email,
+                        googleId
+                    }
                 })//will get handled in callback
 
                 return done(null,newUser)

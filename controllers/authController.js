@@ -6,7 +6,7 @@ const {body} = require("express-validator")
 const myError = require("../lib/myError")
 const {PrismaClient} = require("@prisma/client")
 const prisma = new PrismaClient();
-const { usernameSignupValidation, usernameLoginValidation } = require("../utils/emailAuthValidation")
+const { usernameSignupValidation, usernameLoginValidation } = require("../utils/usernameAuthValidation")
 
 //BUG -> validationHandle
 
@@ -42,17 +42,14 @@ exports.setUsername = [
         .isLength({min:2,max:35})
         .withMessage("Username betwen 2-35 characters")
         .matches(/^[a-zA-Z0-9_.]*$/),
-    body("id")
-        .isInt(),
+
 
     validationHandle,
 
     asyncHandler(async(req,res,next)=>{
         
-        const {username,id} = req.body;
-        if (req.user.id!==id){
-            throw new myError("OAuth cannot set username. Id mismatch.",401);
-        }
+        const {username} = req.body;
+        const id = req.user.id;
         const [existId,existUser] = await Promise.all([ //check for pre-existing usernames
             prisma.user.findUnique({where:{id}}),
             prisma.user.findUnique({where:{username}})
@@ -77,9 +74,9 @@ exports.setUsername = [
 
 ]
 
-
+// auth/local/login
 exports.loginPost = [
-    body("username","Invalid email")
+    body("username","Invalid username")
         .trim(),
     body("password")
         .trim()
@@ -91,6 +88,7 @@ exports.loginPost = [
     asyncHandler(async(req,res,next)=>{
         const {username,password} = req.body;
         const user = await usernameLoginValidation(username,password)
+        console.log('was an error thrown?')
         const token = generateToken(user.id);
         res.status(200).json({
             token,
@@ -99,6 +97,7 @@ exports.loginPost = [
     })
 ]
 
+//auth/local/signup
 exports.signupPost=[
     body("displayName","Invalid display name")
         .trim()
@@ -113,6 +112,9 @@ exports.signupPost=[
         .trim()
         .isLength({min:2,max:35})
         .withMessage("Password must be between 2-35 characters long"),
+    body("confirm_password","Confirm pass failed")
+        .trim()
+        .custom((value, {req}) => value === req.body.password).withMessage("The passwords do not match"),        
 
     validationHandle,
 

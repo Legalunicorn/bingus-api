@@ -21,7 +21,7 @@ model User {
   id               Int           @id @default(autoincrement())
   displayName      String        @map("display_name")
   username         String?       @unique
-  email            String        @unique
+  email            String?        @unique
   googleId         String?       @unique @map("google_id")
   hashedPassword   String?       @map("hashed_password")
   createdAt        DateTime      @default(now())

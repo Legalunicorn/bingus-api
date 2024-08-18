@@ -5,7 +5,7 @@
 ## API Progress
 #### Auth
 
-- [x] `/auth/local/email` __POST
+- [x] `/auth/local/login` __POST
 - [x] `/auth/local/signup` __POST__
 - [x] `/auth/oauth/google/` __GET__
 - [x] `/auth/oauth/google/redirect` __GET__
