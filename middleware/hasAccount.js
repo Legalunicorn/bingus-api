@@ -4,6 +4,7 @@ const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 const asyncHandler = require("express-async-handler");
 const myError = require("../lib/myError");
+const {  get_user_basic } = require("../prisma/userQueries");
 
 
 //make sure has u
@@ -20,6 +21,7 @@ const hasAccount = asyncHandler(async(req,res,next)=>{
         id = decoded.id;  
     })
     req.user = await prisma.user.findUnique({where:{id}})
+    // req.user = await get_user_basic(id); //FIXME changed from just use, to getting their profile information as well
 
     next();
 })

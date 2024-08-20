@@ -32,6 +32,12 @@ exports.getFollowingPosts = asyncHandler(async(req,res,next)=>{
 
 exports.createPost = [
     upload.single("attachment"),
+    (req,res,next)=>{
+        if (!Array.isArray(req.body.tags)){
+            req.body.tags = typeof req.body.tags==="undefined"? []:[req.body.tags];
+        }
+        next();
+    },
     body("body")
         .trim()
         .isLength({min:1})
@@ -60,14 +66,17 @@ exports.createPost = [
         data.body = req.body.body
         console.log("Logging req file",req.file)
         if (!req.file) throw new myError("file empty",400);
+        if (req.file.mimetype=='raw'){
+            throw new myError("Invalid file uploaded",400);
+        }
         if (req.file){
-            const result = await uploadStream(req.file.buffer);
+            const result = await uploadStream(req.file.buffer,"bingus");
             data.attachment = result.secure_url;
             data.public_id = result.public_id;
         }
         if (req.body.gitLink) data.gitLink = req.body.gitLink
         if (req.body.repoLink) data.repoLink = req.body.repoLink
-        if (req.body.tags && req.body.tags.length>0){
+        if (req.body.tags.length>0){
             data.tags = {
                 connectOrCreate: req.body.tags.map(name=>({
                     where:{name},

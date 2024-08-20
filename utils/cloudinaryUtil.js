@@ -2,11 +2,11 @@
 const {Readable} = require("stream");
 const cloudinary = require("../config/cloudinary")
 
- async function uploadStream(buffer){ //removed type from options, may add if needed
+ async function uploadStream(buffer,folder){ //removed type from options, may add if needed
     return new Promise((res,rej)=>{
         const transformStream = cloudinary.uploader.upload_stream(
             {
-                folder:"bingus",
+                folder
             },
             (err,result)=>{
                 if (err) return rej(err);

@@ -5,12 +5,12 @@ const notAccountOwnerAuth = require("../middleware/notOwnerAccountAuth")
 
 
 //GET - all the users 
-router.get("/",
+router.get("/", //DONE
     controller.getAllUsers
 )
 
 // GET -information about a user
-router.get("/:userId",
+router.get("/:userId", //DONE
     controller.getUserDetails
 )
 
@@ -25,31 +25,31 @@ router.get("/:userId/following",
 )
 
 // PATCH - update own profile | ownselfAuth
-router.patch("/:userId/profile",
+router.patch("/:userId/profile", //DONE
     ownAccountAuth,
     controller.patchProfile
 )
 
 // PATH - update own settings |ownselfAuth
-router.patch("/:userId/settings",
+router.patch("/:userId/settings", //DONE
     ownAccountAuth,
     controller.patchSetting
 )
 
 // DELET - delete account  | ownselfAuth
-router.delete("/:userId",
+router.delete("/:userId", //README -> check if comments get deleted as well
     ownAccountAuth,
     controller.deleteUser
 )
 
 // POST - follow new user
-router.post("/:userId/follow",
+router.post("/:userId/follow", //DONE
     notAccountOwnerAuth,
     controller.followUser
 )
 
 // POST - unfollow user
-router.post("/:userId/unfollow",
+router.post("/:userId/unfollow", //DONE
     notAccountOwnerAuth,
     controller.unfollowUser
 )

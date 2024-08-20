@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 
 
 //first verify that the tag is unique
-exports.getTagPosts = asyncHandler(async(req,res,next)=>{
-    const tagId = req.params.tagId;
+exports.getTagPosts = asyncHandler(async(req,res,next)=>{ //DONE
+    const tagId = Number(req.params.tagId);
     const exist = await prisma.tag.findUnique({
         where:{id:tagId}
     })

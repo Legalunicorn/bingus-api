@@ -2,13 +2,64 @@ const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 
 
- async function get_all_users(){
-    //consider having an option for more user details,
-    // such as followers or following
-    const users = await prisma.user.findMany({
+//README display information about a user
+const SELECT_USER_BASIC = {
+    id:true,
+    username:true,
+    displayName:true,
+    profile:{
         select:{
-            displayName:true,
+            profilePicture:true
+        }
+    }
+}
+
+//README a detailed user profile
+const SELECT_USER_DETAILED = {
+    id:true,
+    displayName:true,
+    username:true,
+    createdAt:true,
+    _count:{
+        select:{
+            followers:true,
+            following:true
+        }
+    },
+    profile:{
+        select:{
+            website:true,
+            profilePicture:true,
+            github:true
+        }
+    },
+    posts:{
+        select:{
+            body:true,
+            gitLink:true,
+            repoLink:true,
+            tags:{
+                select:{
+                    name:true
+                }
+            },
+            _count:{
+                select:{
+                    likes:true,
+                    comments:true
+                }
+            }
+        }
+    }
+}
+
+async function get_user_basic(id){
+    return await prisma.user.findUnique({
+        where:{id},
+        select:{
+            id:true,
             username:true,
+            displayName:true,
             profile:{
                 select:{
                     profilePicture:true
@@ -16,52 +67,22 @@ const prisma = new PrismaClient();
             }
         }
     })
-
-    return users
 }
 
- async function get_user_details(id){
-    const user = await prisma.user.findUnique({
-        where:{id},
-        select:{
-            displayName:true,
-            username:true,
-            createdAt:true,
-            _count:{
-                select:{
-                    followers:true,
-                    following:true
-                }
-            },
-            profile:{
-                select:{
-                    website:true,
-                    profilePicture:true,
-                    github:true,
-                }
-            },
-            posts:{
-                select:{
-                    body:true,
-                    gitLink:true,
-                    repoLink:true,
-                    tags:{
-                        select:{name:true}
-                    },
-                    _count:{
-                        select:{
-                            likes:true,
-                            comments:true
-                        }
-                    }
-                },
-
-            }
-
-        }
+ async function get_all_users(){
+    //consider having an option for more user details,
+    // such as followers or following
+    return await prisma.user.findMany({
+        select:SELECT_USER_BASIC
     })
 }
 
+ async function get_user_details(id){
+    return  await prisma.user.findUnique({
+        where:{id},
+        select:SELECT_USER_DETAILED
+    })
+}
 /**
  * Helper function , to get either following or followers
  * @param {*} isFollowing Whether we are looking for followings or following
@@ -72,19 +93,11 @@ async function followingOrfollowers(isFollowing,id){
         where:{
             following:{
                 some:
-                    isFollowing?{ followingId:id}:{followerId:id}
+                    isFollowing?{ followerId:id}:{followingId:id}
             }
         },
         //First layer profile so just names and picture will do
-        select:{
-            displayName:true,
-            username:true,
-            profile:{
-                select:{
-                    profilePicture:true
-                }
-            }
-        }
+        select:SELECT_USER_BASIC
     })
     return res;
 }
@@ -99,47 +112,18 @@ async function followingOrfollowers(isFollowing,id){
 }
 
  async function update_user(id,updateData){
-    return await prisma.user.update({
-        where:{id},
-        data:{
-            ...updateData
+    console.log("UD ID",id)
+    return await prisma.profile.upsert({
+        where:{userId:id},
+        update:updateData,
+        create:{
+            ...updateData,
+            userId:id
         },
-        //Copied from get User details,
         select:{
-            displayName:true,
-            username:true,
-            createdAt:true,
-            _count:{
-                select:{
-                    followers:true,
-                    following:true
-                }
-            },
-            profile:{
-                select:{
-                    website:true,
-                    profilePicture:true,
-                    github:true,
-                }
-            },
-            posts:{
-                select:{
-                    body:true,
-                    gitLink:true,
-                    repoLink:true,
-                    tags:{
-                        select:{name:true}
-                    },
-                    _count:{
-                        select:{
-                            likes:true,
-                            comments:true
-                        }
-                    }
-                },
-
+            user:{
+                select:SELECT_USER_DETAILED
             }
-
         }
     })
 }
@@ -156,6 +140,7 @@ async function followingOrfollowers(isFollowing,id){
 //IDEA, maybe i should seperate json queries that are used commonly into their own variables
 
 module.exports = {
+    get_user_basic,
     get_all_users,
     get_user_details,
     get_followers,

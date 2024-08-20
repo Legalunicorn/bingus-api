@@ -9,10 +9,10 @@ const commentRoutes = require("./commentRoutes")
 
 
 
-router.use("/auth",authRoutes) //CHECCKED
-router.use("/posts",postRoutes) 
-router.use("/users",userRoutes)
-router.use("/tags",tagRoutes)
+router.use("/auth",authRoutes) //DONE
+router.use("/posts",postRoutes) //DONE
+router.use("/users",userRoutes) //DONE
+router.use("/tags",tagRoutes) //DONE
 router.use("/comments",commentRoutes)
 
 

@@ -1,9 +1,9 @@
 const {PrismaClient} = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
-const { get_all_users, get_user_details, get_followers, delete_user } = require("../prisma/userQueries");
+const { get_all_users, get_user_details, get_followers, delete_user, update_user, get_following } = require("../prisma/userQueries");
 const { body, param } = require("express-validator");
 const {validationHandle} = require("../middleware/validationHandle");
-const multerCheckFile = require("../middleware/multerCheckFile");
+const upload = require("../config/multer")
 const myError = require("../lib/myError");
 const { uploadStream, deleteFile } = require("../utils/cloudinaryUtil");
 const prisma = new PrismaClient();
@@ -30,7 +30,8 @@ exports.getUserDetails = [
         .isNumeric(),
 
     asyncHandler(async(req,res,next)=>{
-        const id = Number(req.user.id);
+        // const id = Number(req.user.id);//
+        const id = Number(req.params.userId);
         const user = await get_user_details(id);
         if (user===null){
             return res.status(404).json({error:`User with od:${id} not found.`})
@@ -52,7 +53,7 @@ exports.getFollowers = [
         const id = Number(req.params.userId);
         const exist = await prisma.user.findUnique({where:{id}});
         if (!exist) return res.status(404).json({error:`UserID ${id} does not exist.`})
-        
+        console.log("getting followers of user: ",id);
         const followers = await get_followers(id);
         res.status(200).json({followers});
     })
@@ -69,7 +70,7 @@ exports.getFollowing = [
         const exist = await prisma.user.findUnique({where:{id}});
         if (!exist) return res.status(404).json({error:`UserID ${id} does not exist.`})
         
-        const followers = await get_followers(id);
+        const followers = await get_following(id);
         res.status(200).json({followers});
     })
 ]
@@ -79,10 +80,12 @@ exports.getFollowing = [
 - 
 */
 exports.patchProfile = [
+    upload.single("attachment"),
     param("userId","invalid user id")
         .trim()
         .isNumeric(),
     body("bio")
+        .optional()
         .trim()
         .isLength({max:350})
         .withMessage("max bio length is 350"),
@@ -98,41 +101,43 @@ exports.patchProfile = [
         .trim()
         .isURL()
         .withMessage("github not valid url"),
-
     validationHandle,
-    multerCheckFile,
 
     asyncHandler(async(req,res,next)=>{
-        //User is validated to be OWNER based on middleware in routes 
-        //all is optional here which is a mess
-        // maybe we make them not optional-?
-        //  user is in req.user
+
+        //This is the only route we need the pfp_public_id so we should just retreive it 
+        const user_profile = await prisma.profile.findUnique({
+            where:{userId:req.user.id}
+        })
         //
-        const updateData = {id:req.user.id}
+        const updateData = {}
+        console.log("this is req.user now",req.user)
         
         if (req.file){
-            //reject NON-images
-            if (req.file.mimetype!=='image'){
+            console.log(req.file);
+            const mimetype = req.file.mimetype.split("/")[0];
+            if (mimetype!=='image'){
                 throw new myError("Only image uploads allowed for profilPicture",400);
             }
             //upload new picture
-            const result = await uploadStream(req.file.buffer)
+            const result = await uploadStream(req.file.buffer,"bingus_pfp")
+            console.log("======================new pfp status:",result)
+            console.log("")
             //success upload, delete old pfp
-            if (req.user.public_id){
-                const deleted = await deleteFile(req.user.public_id); //delete this
-                console.log("deleted: ",deleted)
+
+            if (user_profile.pfp_public_id){ //Delete old profile picteu
+                const deleted = await deleteFile(user_profile.pfp_public_id); //delete this
+                console.log("======================old pfp status: ",deleted)
             }
-            updateData.attachment = result.secure_url;
-            updateData.public_id = result.public_id;
+            updateData.profilePicture = result.secure_url;
+            updateData.pfp_public_id = result.public_id;
         }
+        if (req.body.bio) updateData.bio = req.body.bio
         if (req.body.github) updateData.github=req.body.github
         if (req.body.website) updateData.website=req.body.website
-        updateData.bio = req.body.bio;
         
-        const user = await update_user(id,updateData)
+        const user = await update_user(req.user.id,updateData)
         res.status(200).json({user})
-
-
     })
 ]
 
@@ -145,10 +150,15 @@ exports.patchSetting = [
     asyncHandler(async(req,res,next)=>{
         //just update settings, dont need to return anything honestly
         const isDarkMode = req.body.theme==="dark";
-        const settings = await prisma.userSettings.update({
-            where:{userId:id},
-            data:{
+        const settings = await prisma.userSetting.upsert({
+            where:{userId:req.user.id},
+            update:{
                 isDarkMode
+            },
+            create:{
+                isDarkMode,
+                userId:req.user.id
+
             }
         })
         res.status(200).json({settings})
@@ -174,15 +184,17 @@ exports.followUser = asyncHandler(async(req,res,next)=>{
     */
    const result = await prisma.follow.upsert({
         where:{
-            followerId:req.user.id,
-            followingId:req.params.userId
+            id:{
+                followerId:req.user.id,
+                followingId:Number(req.params.userId)
+            }
         },
         create:{
             followerId:req.user.id,
-            followingId:req.params.userId
+            followingId:Number(req.params.userId)
         },
         update:{
-            createdAt: Date()
+            createdAt: new Date().toISOString()
         }
 
    })
@@ -194,7 +206,7 @@ exports.unfollowUser = asyncHandler(async(req,res,next)=>{
     const result = await prisma.follow.deleteMany({
         where:{
             followerId:req.user.id,
-            followingId:req.params.userId
+            followingId:Number(req.params.userId)
         }
    })
    console.log("Result of unfollow",result)
