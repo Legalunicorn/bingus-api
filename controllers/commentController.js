@@ -29,7 +29,10 @@ exports.postComment = [
     body("body")
         .trim()
         .isLength({min:1,max:400}),
-    query("parentComment")
+    body("postId")
+        .trim()
+        .isInt(),
+    body("parentComment")
         .optional()
         .trim()
         .isNumeric(),
@@ -38,17 +41,25 @@ exports.postComment = [
     asyncHandler(async(req,res,next)=>{
         //Comment CAN have parentComment, but that parent comment cannot have parent comment
         //only one layer of parenting allowed
+        let {postId,body} = req.body;
+        postId = Number(postId);
+        const data = {}
         
-        if (req.query.parentComment){
-            const parentId = Number(req.query.parentComment)
+        if (req.body.parentComment){
+            const parentId = Number(req.body.parentComment)
             const exist = await prisma.comment.findUnique({where:{id:parentId}})
             if (!exist) throw new myError(`Parent comment ${parentId} does not exist`,400);
             if (exist.parentCommentId) throw new myError(`Illegal comment: Parent comment is already a child`,400);
+            if (exist.postId!=postId) throw new myError(`Illegal comment, parent in different post`,400);
+            data.parentCommentId=exist.id;
         }
 
-        const comment = await( req.query.parentComment?
-            create_comment(req.user.id,req.body.body,req.query.parentComment)
-            :create_comment(req.user.id,req.body.body))
+        
+        data.body = body;
+        data.postId = postId;
+        data.userId=req.user.id;
+
+        const comment = await create_comment(data);
 
         res.status(200).json({comment});
     })
@@ -73,8 +84,10 @@ exports.postCommentLike = asyncHandler(async(req,res,next)=>{
     const commentId = req.comment.id;
     const result = await prisma.commentLike.upsert({
         where:{
-            userId:req.user.id,
-            commentId
+            userId_commentId:{
+                userId:req.user.id,
+                commentId
+            }
         },
         update:{},
         create:{

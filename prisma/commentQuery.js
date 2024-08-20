@@ -1,15 +1,12 @@
 const {PrismaClient} = require("@prisma/client")
 const prisma = new PrismaClient();
 
- async function create_comment(userId,body,parentCommentId){
+ async function create_comment(commentData){
 
     return await prisma.comment.create({
-        data:{
-            body,
-            userId,
-            ...(parentCommentId? parentCommentId: {})
-        },
+        data:commentData,
         select:{
+            id:true,
             body:true,
             createdAt:true,
             parentCommentId:true, //should be blank in result if none

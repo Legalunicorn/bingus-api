@@ -19,16 +19,22 @@ router.post("/",
     controller.postComment
 )
 
-router.post("/:commentId:like",
+router.post("/:commentId/like",
     requireAuth,
     commentExist,
     controller.postCommentLike
 )
 
-router.post("/:commentId:like",
+router.post("/:commentId/unlike",
     requireAuth,
     commentExist,
     controller.postCommentUnlike
+)
+
+router.delete("/:commentId",
+    requireAuth,
+    commentExist,
+    controller.deleteComment
 )
 
 module.exports = router

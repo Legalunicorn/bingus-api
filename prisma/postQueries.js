@@ -49,8 +49,10 @@ const INCLUDE_SINGLE_POST ={
     comments:{
         where:{parentCommentId:null},
         select:{
+            id:true,
             body:true,
             createdAt:true,
+            parentCommentId:true,
             _count:{
                 select:{
                     likes:true
@@ -61,6 +63,7 @@ const INCLUDE_SINGLE_POST ={
             },
             childComment:{
                 select:{
+                    id:true,
                     body:true,
                     createdAt:true,
                     parentCommentId:true,
