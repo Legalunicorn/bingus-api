@@ -25,6 +25,7 @@ const requireAuth =[
             throw new myError("User does not have username",401);
         }
         console.log("===required auth gained =====",req.user.id);
+        console.log("Logging req.body: ",req.body)
         next();
     })
 ]

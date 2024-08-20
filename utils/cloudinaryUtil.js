@@ -3,7 +3,7 @@ const {Readable} = require("stream");
 const cloudinary = require("../config/cloudinary")
 
  async function uploadStream(buffer){ //removed type from options, may add if needed
-    return new PromiseRejectionEvent((res,rej)=>{
+    return new Promise((res,rej)=>{
         const transformStream = cloudinary.uploader.upload_stream(
             {
                 folder:"bingus",
@@ -21,7 +21,9 @@ const cloudinary = require("../config/cloudinary")
 }
 
  async function deleteFile(public_id){
+    
     result = await cloudinary.uploader.destroy(public_id)
+    console.log("DELTED:",result);
 }
 
 module.exports ={

@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const requireAuth = require("./requireAuth");
 const {PrismaClient} = require("@prisma/client");
 const myError = require("../lib/myError");
+const { get_post } = require("../prisma/postQueries");
 const prisma = new PrismaClient();
 
 /**
@@ -19,9 +20,10 @@ const ownPostAuth = [
     requireAuth,
     asyncHandler(async(req,res,next)=>{
         const id = Number(req.params.postId)
-        const post = await prisma.post.findUnique({
-            where:{id}
-        })
+        const post = await get_post(id);
+        // const post = await prisma.post.findUnique({
+        //     where:{id}
+        // })
         if (!post){
             res.status(404).send(`Post with ID:${id} does not exist`);
             return;
@@ -31,9 +33,8 @@ const ownPostAuth = [
             throw new myError(`POST ${id} not owned by ${req.user.id}`,401)
         }
 
-        req.params.postId = Number(req.params.postId) //dont have to do this in controller endpoint
-        //Put post in request
-    req.post = post;    
+        req.params.postId = Number(req.params.postId) //TODO check if this is used, because req.post has all the data
+        req.post = post;    
         next(); //sucessful
 
     })

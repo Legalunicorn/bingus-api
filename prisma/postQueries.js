@@ -1,29 +1,94 @@
 const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 
- async function all_posts(){
-    const posts = await prisma.post.findMany({ 
-        include:{//bug change this to select 
+
+//README display information about a user
+const SELECT_USER_BASIC = {
+    id:true,
+    username:true,
+    displayName:true,
+    profile:{
+        select:{
+            profilePicture:true
+        }
+    }
+}
+
+//README information about posts for the feed 
+const INCLUDE_FEED_POST = {
+    _count:{
+        select:{
+            likes:true,
+            comments:true,
+        }
+    },
+    tags:{
+        select:{name:true}
+    },
+    author:{
+        select:SELECT_USER_BASIC
+    }
+}
+
+//README information about a focused post (ie, comments and everything)
+const INCLUDE_SINGLE_POST ={
+    _count:{
+        select:{
+            likes:true,
+            comments:true,
+        }
+    },
+    tags:{
+        select:{
+            name:true
+        }
+    },
+    author:{
+        select:SELECT_USER_BASIC
+    },
+    comments:{
+        where:{parentCommentId:null},
+        select:{
+            body:true,
+            createdAt:true,
             _count:{
                 select:{
-                    likes:true,
-                    comments:true,
+                    likes:true
                 }
             },
-            tags:{
-                select:{name:true}
+            user:{
+                select:SELECT_USER_BASIC
             },
-            author:{
+            childComment:{
                 select:{
-                    username:true,
-                    profile:{
+                    body:true,
+                    createdAt:true,
+                    parentCommentId:true,
+                    _count:{
                         select:{
-                            profilePicture:true,
+                            likes:true
                         }
+                    },
+                    user:{
+                        select:SELECT_USER_BASIC
                     }
+                },
+                orderBy:{
+                    createdAt:'asc'
                 }
             }
         },
+        orderBy:{
+            createdAt:'desc'
+        }
+    }
+}
+//
+
+ async function all_posts(){
+    const posts = await prisma.post.findMany({ 
+        include:INCLUDE_FEED_POST
+        ,
         orderBy:{
             createdAt:'desc'
         }
@@ -33,30 +98,9 @@ const prisma = new PrismaClient();
 
  async function user_posts(id){
     const posts = await prisma.post.findMany({ 
-        include:{ //not sure what this is
-            _count:{
-                select:{
-                    likes:true,
-                    comments:true,
-                }
-            },
-            tags:{
-                select:{name:true}
-            },
-            author:{
-                select:{
-                    displayName:true,
-                    username:true,
-                    profile:{
-                        select:{
-                            profilePicture:true,
-                        }
-                    }
-                }
-            }
-        },
+        include:INCLUDE_FEED_POST,
         where:{
-            user:{id}
+            userId:id
         },
         orderBy:{
             createdAt:'desc'
@@ -71,65 +115,7 @@ const prisma = new PrismaClient();
         where:{
             id
         },
-        include:{
-            _count:{
-                select:{
-                    likes:true,
-                    comments:true,
-                }
-            },
-            tags:{
-                select:{
-                    name:true
-                }
-            },
-            //BUG, this will select all child comment as main comment as well!
-            comments:{
-                where:{parentCommentId:null},
-                select:{//==
-                    body:true,
-                    createdAt:true,
-                    _count:{
-                        select:{
-                            likes:true
-                        }
-                    },
-                    user:{
-                        select:{
-                            id:true,
-                            username:true,
-                            profile:{
-                                select:{
-                                    profilePicture:true,
-                                }
-                            },
-                        }
-                    },
-                    childComment:{
-                        select:{
-                            body:true,
-                            createdAt:true,
-                            parentCommentId:true,
-                            _count:{
-                                select:{
-                                    likes:true
-                                }
-                            },
-                            user:{
-                                select:{
-                                    displayName: true,
-                                    profile:{
-                                        select:{
-                                            profilePicture:true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }//==
-            }
-        }
+        include:INCLUDE_SINGLE_POST
     })
     return post;
 }
@@ -146,27 +132,7 @@ const prisma = new PrismaClient();
                 }
             }
         },
-        include:{
-            _count:{
-                select:{
-                    likes:true,
-                    comments:true
-                }
-            },
-            tags:{
-                select:{name:true}
-            },
-            author:{
-                select:{
-                    displayName,
-                    profile:{
-                        select:{
-                            profilePicture:true,
-                        }
-                    }
-                }
-            }
-        },
+        include:INCLUDE_FEED_POST,
         orderBy:{
             createdAt:'desc'
         }
@@ -175,19 +141,10 @@ const prisma = new PrismaClient();
     return posts
 }
 
- async function create_post(body,userId,tags){
 
-    const post = await prisma.post.create({
-        data:{
-            body,
-            userId,
-            //spread operatr takes the priperties and spread to the parent object
-            ...(tags && {
-                tags:{
-                    connect: tags.map(tag=>{tag.id})
-                }
-            })
-        },
+async function create_post(reqData){
+    return await prisma.post.create({
+        data:reqData,
         include:{
             _count:{
                 select:{
@@ -199,67 +156,49 @@ const prisma = new PrismaClient();
                 select:{name:true}
             },
             author:{
-                select:{
-                    displayName,
-                    profile:{
-                        select:{
-                            profilePicture:true,
-                        }
-                    }
-                }
+                select:SELECT_USER_BASIC
             }
+
         }
     })
-
-    return post
 }
 
  async function delete_post(id){
     const post = await prisma.post.delete({
-        where:{
-            id
-        }
+        where:{id},
+        include:INCLUDE_FEED_POST
     })
     return post;
 }
 
- async function update_post(id,postData,tags){
-    //should try to set tags regardless
-    const post = await prisma.post.update({
-        where:{
-            id
-        },
-        data:{
-            ...postData,
-            tags:{
-                set: tags.map(tag=>({id:tag.id}))
-            }
-        },
-        include:{
-            _count:{
-                select:{
-                    likes:true,
-                    comments:true
-                }
-            },
-            tags:{
-                select:{name:true}
-            },
-            author:{
-                select:{
-                    displayName,
-                    profile:{
-                        select:{
-                            profilePicture:true,
-                        }
+
+
+async function update_post(id,postData){
+    return await prisma.$transaction(async(tx)=>{
+        if (postData.tags){ //If we are to update tags, we delete all exiting relations
+            await tx.post.update({
+                where:{id},
+                data:{
+                    tags:{
+                        set:[]
                     }
                 }
-            }
+            })
         }
-    })
 
-    
+        const post = await tx.post.update({
+            where:{id},
+            data:{
+                ...postData,
+            },
+            include:INCLUDE_FEED_POST
+        })
+
+        return post;
+    })
 }
+
+
 
 module.exports = {
     all_posts,
@@ -270,3 +209,5 @@ module.exports = {
     delete_post,
     update_post
 };
+
+//READ ME these are the st
