@@ -1,7 +1,14 @@
-
+//TODO -> store the mimestype of post if exist
+// so that its easier to display in the frontend
 
 ## ERD
 ![erd](/public/images/ERD.png)
+
+## Major features todo
+- Implement Access and Refresh Tokens with JWT
+- Integrate notifications model for messages, likes, comments
+- Add socket.io for live messages between users 
+
 ## API Progress
 #### Auth
 

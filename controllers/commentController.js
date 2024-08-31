@@ -1,6 +1,6 @@
 const {PrismaClient} = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
-const { body,query } = require("express-validator");
+const { body } = require("express-validator");
 const myError = require("../lib/myError");
 const { create_comment } = require("../prisma/commentQuery");
 const { validationHandle } = require("../middleware/validationHandle");

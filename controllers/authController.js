@@ -8,7 +8,6 @@ const {PrismaClient} = require("@prisma/client")
 const prisma = new PrismaClient();
 const { usernameSignupValidation, usernameLoginValidation } = require("../utils/usernameAuthValidation")
 
-//BUG -> validationHandle
 
 exports.googleGet = (req,res,next)=>{
     const authenticator = passport.authenticate('google',{

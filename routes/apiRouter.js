@@ -6,6 +6,7 @@ const postRoutes = require("./postRoutes")
 const userRoutes = require("./userRoutes")
 const tagRoutes = require("./tagRoutes")
 const commentRoutes = require("./commentRoutes")
+const initRoutes = require("./initRoutes")
 
 
 
@@ -14,6 +15,7 @@ router.use("/posts",postRoutes) //DONE
 router.use("/users",userRoutes) //DONE
 router.use("/tags",tagRoutes) //DONE
 router.use("/comments",commentRoutes)
+router.use("/init",initRoutes)
 
 
 module.exports = router

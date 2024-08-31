@@ -9,7 +9,7 @@ const myError = require("../lib/myError");
 const upload = require("../config/multer")
 
 
-exports.getManyPosts = asyncHandler(async(req,res,next)=>{ //DONE
+exports.getManyPosts = asyncHandler(async(req,res,next)=>{ //DONE, actually why did i make this for? the feed will ge tall post no?
     const userId = Number(req.query.userId); //user if valid 
     const posts = await (userId? user_posts(userId): all_posts()); //depends if userId was supplied in query
     //Debugging
@@ -89,7 +89,7 @@ exports.createPost = [
     })
 ]
 
-exports.deletePost = asyncHandler(async(req,res,next)=>{ //FIXME
+exports.deletePost = asyncHandler(async(req,res,next)=>{ 
     //Middleware has checked the req.user is the owner of postId
     const post = req.post;
     console.log("del post:",post);

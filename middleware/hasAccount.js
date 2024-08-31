@@ -21,7 +21,6 @@ const hasAccount = asyncHandler(async(req,res,next)=>{
         id = decoded.id;  
     })
     req.user = await prisma.user.findUnique({where:{id}})
-    // req.user = await get_user_basic(id); //FIXME changed from just use, to getting their profile information as well
 
     next();
 })

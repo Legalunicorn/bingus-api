@@ -4,7 +4,7 @@ const ownAccountAuth = require("../middleware/ownAccountAuth")
 const notAccountOwnerAuth = require("../middleware/notOwnerAccountAuth")
 
 
-//GET - all the users 
+//GET - all the users -> inputs id
 router.get("/", //DONE
     controller.getAllUsers
 )
@@ -37,7 +37,7 @@ router.patch("/:userId/settings", //DONE
 )
 
 // DELET - delete account  | ownselfAuth
-router.delete("/:userId", //README -> check if comments get deleted as well
+router.delete("/:userId", //DONE
     ownAccountAuth,
     controller.deleteUser
 )

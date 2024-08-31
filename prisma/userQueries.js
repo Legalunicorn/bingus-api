@@ -136,6 +136,28 @@ async function followingOrfollowers(isFollowing,id){
     })
 }
 
+async function q_new_users(){
+    return await prisma.user.findMany({
+        select:SELECT_USER_BASIC,
+        take:3,
+        orderBy:{
+            createdAt:'desc'
+        }
+    })
+}
+
+async function q_top_users(){
+    return await prisma.user.findMany({
+        select:SELECT_USER_BASIC,
+        take:3,
+        orderBy:{
+            followers:{
+                _count:'desc'
+            }
+        }
+    })
+}
+
 
 //IDEA, maybe i should seperate json queries that are used commonly into their own variables
 
@@ -146,5 +168,7 @@ module.exports = {
     get_followers,
     get_following,
     update_user,
-    delete_user
+    delete_user,
+    q_new_users,
+    q_top_users
 };

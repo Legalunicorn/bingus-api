@@ -124,10 +124,12 @@ const INCLUDE_SINGLE_POST ={
 }
 
  async function get_following_posts(userId){
+    console.log(userId)
+    
     const posts = await prisma.post.findMany({
         //the author of the post is being followed by x user Id
-        where:{
-            author:{
+        where:{ //find a post
+            author:{ //where the POSTER of the post
                 followers:{
                     some:{
                         followerId:userId
@@ -140,6 +142,7 @@ const INCLUDE_SINGLE_POST ={
             createdAt:'desc'
         }
     })
+    console.log("posts are",posts)
 
     return posts
 }
