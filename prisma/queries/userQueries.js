@@ -1,57 +1,7 @@
 const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
+const {SELECT_USER_BASIC,SELECT_ISUSER_FOLLOWING,SELECT_USER_DETAILED, SELECT_USER_WITH_FOLLOW} = require("./querySnippets")
 
-
-//README display information about a user
-const SELECT_USER_BASIC = {
-    id:true,
-    username:true,
-    displayName:true,
-    profile:{
-        select:{
-            profilePicture:true
-        }
-    }
-}
-
-//README a detailed user profile
-const SELECT_USER_DETAILED = {
-    id:true,
-    displayName:true,
-    username:true,
-    createdAt:true,
-    _count:{
-        select:{
-            followers:true,
-            following:true
-        }
-    },
-    profile:{
-        select:{
-            website:true,
-            profilePicture:true,
-            github:true
-        }
-    },
-    posts:{
-        select:{
-            body:true,
-            gitLink:true,
-            repoLink:true,
-            tags:{
-                select:{
-                    name:true
-                }
-            },
-            _count:{
-                select:{
-                    likes:true,
-                    comments:true
-                }
-            }
-        }
-    }
-}
 
 async function get_user_basic(id){
     return await prisma.user.findUnique({
@@ -69,7 +19,7 @@ async function get_user_basic(id){
     })
 }
 
- async function get_all_users(){
+ async function get_all_users(){ //README  deleete this if not used
     //consider having an option for more user details,
     // such as followers or following
     return await prisma.user.findMany({
@@ -77,10 +27,10 @@ async function get_user_basic(id){
     })
 }
 
- async function get_user_details(id){
+ async function get_user_details(id,userId){
     return  await prisma.user.findUnique({
         where:{id},
-        select:SELECT_USER_DETAILED
+        select:SELECT_USER_DETAILED(userId)
     })
 }
 /**
@@ -122,7 +72,7 @@ async function followingOrfollowers(isFollowing,id){
         },
         select:{
             user:{
-                select:SELECT_USER_DETAILED
+                select:SELECT_USER_DETAILED(userId)
             }
         }
     })
@@ -136,19 +86,22 @@ async function followingOrfollowers(isFollowing,id){
     })
 }
 
-async function q_new_users(){
-    return await prisma.user.findMany({
-        select:SELECT_USER_BASIC,
+async function q_new_users(userId){
+    const data = await prisma.user.findMany({
+        select:SELECT_USER_WITH_FOLLOW(userId),
         take:3,
         orderBy:{
             createdAt:'desc'
         }
     })
+    return data;
+
+
 }
 
-async function q_top_users(){
+async function q_top_users(userId){
     return await prisma.user.findMany({
-        select:SELECT_USER_BASIC,
+        select:SELECT_USER_WITH_FOLLOW(userId),
         take:3,
         orderBy:{
             followers:{

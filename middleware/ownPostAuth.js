@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const requireAuth = require("./requireAuth");
 const {PrismaClient} = require("@prisma/client");
 const myError = require("../lib/myError");
-const { get_post } = require("../prisma/postQueries");
+const { get_post } = require("../prisma/queries/postQueries");
 const prisma = new PrismaClient();
 
 /**

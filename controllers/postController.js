@@ -1,6 +1,6 @@
 const {PrismaClient} = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
-const {user_posts, all_posts, get_post, get_following_posts, create_post, delete_post, update_post } = require("../prisma/postQueries");
+const {user_posts, all_posts, get_post, get_following_posts, create_post, delete_post, update_post } = require("../prisma/queries/postQueries");
 const { body } = require("express-validator");
 const prisma = new PrismaClient();
 const {validationHandle} = require("../middleware/validationHandle")

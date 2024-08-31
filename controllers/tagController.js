@@ -1,6 +1,6 @@
 const {PrismaClient} = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
-const { get_tag_posts } = require("../prisma/tagQueries");
+const { get_tag_posts } = require("../prisma/queries/tagQueries");
 const prisma = new PrismaClient();
 
 

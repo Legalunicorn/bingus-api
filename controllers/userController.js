@@ -1,6 +1,6 @@
 const {PrismaClient} = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
-const { get_all_users, get_user_details, get_followers, delete_user, update_user, get_following } = require("../prisma/userQueries");
+const { get_all_users, get_user_details, get_followers, delete_user, update_user, get_following } = require("../prisma/queries/userQueries");
 const { body, param } = require("express-validator");
 const {validationHandle} = require("../middleware/validationHandle");
 const upload = require("../config/multer")
@@ -32,7 +32,7 @@ exports.getUserDetails = [
     asyncHandler(async(req,res,next)=>{
         // const id = Number(req.user.id);//
         const id = Number(req.params.userId);
-        const user = await get_user_details(id);
+        const user = await get_user_details(id,req.user.id);
         if (user===null){
             return res.status(404).json({error:`User with od:${id} not found.`})
         } else{

@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const controller = require("../controllers/userController")
 const ownAccountAuth = require("../middleware/ownAccountAuth")
-const notAccountOwnerAuth = require("../middleware/notOwnerAccountAuth")
+const notAccountOwnerAuth = require("../middleware/notOwnerAccountAuth");
+const requireAuth = require("../middleware/requireAuth");
 
 
 //GET - all the users -> inputs id
@@ -11,6 +12,7 @@ router.get("/", //DONE
 
 // GET -information about a user
 router.get("/:userId", //DONE
+    requireAuth,
     controller.getUserDetails
 )
 
