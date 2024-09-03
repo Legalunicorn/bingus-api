@@ -86,10 +86,16 @@ async function followingOrfollowers(isFollowing,id){
     })
 }
 
+//TODO EXCLUDE uerId
 async function q_new_users(userId){
     const data = await prisma.user.findMany({
         select:SELECT_USER_WITH_FOLLOW(userId),
         take:3,
+        where:{
+            id:{
+                not:userId
+            }
+        },
         orderBy:{
             createdAt:'desc'
         }
@@ -98,11 +104,16 @@ async function q_new_users(userId){
 
 
 }
-
+//TODO EXCLUDE USERID
 async function q_top_users(userId){
     return await prisma.user.findMany({
         select:SELECT_USER_WITH_FOLLOW(userId),
         take:3,
+        where:{
+            id:{
+                not:userId
+            }
+        },
         orderBy:{
             followers:{
                 _count:'desc'

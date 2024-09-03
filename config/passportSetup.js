@@ -16,6 +16,7 @@ passport.use(
         async(accessToken,refreshToken,profile,done)=>{
             try{
             //for now we ignore the access and refresh token
+                console.log(profile); //profile.photos[0].value
 
                 const googleId = profile.id;
                 const displayName = profile.displayName
@@ -37,12 +38,21 @@ passport.use(
                 }
 
                 //Completely new user
+                const username = 'user'+ new Date().valueOf();
 
                 const newUser = await prisma.user.create({
+                //Set randompassword for new users
                     data:{
+                        setUsername:false, //redirect them to set user name page
                         displayName,
                         email,
-                        googleId
+                        googleId,
+                        username,
+                        profile:{
+                            create:{
+                                profilePicture:profile.photos[0].value
+                            }
+                        }
                     }
                 })//will get handled in callback
 

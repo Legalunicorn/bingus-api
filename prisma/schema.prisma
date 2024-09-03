@@ -21,9 +21,10 @@ model User {
   id               Int           @id @default(autoincrement())
   displayName      String        @map("display_name")
   username         String?       @unique
-  email            String?        @unique
+  email            String?       @unique
   googleId         String?       @unique @map("google_id")
   hashedPassword   String?       @map("hashed_password")
+  setUsername      Boolean       @default(true) //Added this field to check for oauth users first passord set
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   comments         Comment[]
@@ -50,7 +51,7 @@ model Profile {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   userId         Int      @unique
-  user           User     @relation(fields: [userId], references: [id])
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profile")
 }
@@ -59,7 +60,7 @@ model UserSetting {
   id         Int     @id @default(autoincrement())
   isDarkMode Boolean @default(true)
   userId     Int     @unique
-  user       User    @relation(fields: [userId], references: [id])
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_setting")
 }
@@ -96,7 +97,7 @@ model Comment {
   id              Int           @id @default(autoincrement())
   body            String
   createdAt       DateTime      @default(now())
-  user            User          @relation(fields: [userId], references: [id],onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          Int
   likes           CommentLike[]
   parentCommentId Int?

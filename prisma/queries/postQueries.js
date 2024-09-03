@@ -2,6 +2,10 @@ const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 const { SELECT_USER_BASIC,INCLUDE_FEED_POST,INCLUDE_SINGLE_POST } = require("./querySnippets");
 
+
+//TODO figure out for ech post, if the user has liked the post before or not
+
+
  async function all_posts(){
     const posts = await prisma.post.findMany({ 
         include:INCLUDE_FEED_POST
@@ -56,7 +60,7 @@ const { SELECT_USER_BASIC,INCLUDE_FEED_POST,INCLUDE_SINGLE_POST } = require("./q
             createdAt:'desc'
         }
     })
-    console.log("posts are",posts)
+    // console.log("posts are",posts)
 
     return posts
 }

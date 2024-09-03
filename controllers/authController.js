@@ -21,15 +21,16 @@ exports.googleRedirectGet = [
     passport.authenticate('google',{session:false}),
     (req,res,next)=>{
         const user = req.user;
-        if (!user.username){
+        if (!user.setUsername){ //because u made a custom username. this wont pass
             const token = generateToken(user.id,'10min') //
-            return res.redirect(`${process.env.CLIENT_URL}/auth/set-username?token=${token}`)
+            console.log("GENERATED TOK TOK",token)
+            return res.redirect(`${process.env.CLIENT_URL}/auth/oauth/setusername?token=${token}`)
             //username form to point back to different endpoint
         }
         //Already registered Gooogle account with username
         const token = generateToken(user.id);
         console.log("====== google redirect registered =====")
-        res.redirect(`${process.env.CLIENT_URL}?token=${token}%username=${user.username}`)
+        res.redirect(`${process.env.CLIENT_URL}/auth/login?token=${token}&username=${user.username}`)
         
     }
 ]
@@ -46,9 +47,11 @@ exports.setUsername = [
     validationHandle,
 
     asyncHandler(async(req,res,next)=>{
+
         
         const {username} = req.body;
         const id = req.user.id;
+        console.log("modify id ",id)
         const [existId,existUser] = await Promise.all([ //check for pre-existing usernames
             prisma.user.findUnique({where:{id}}),
             prisma.user.findUnique({where:{username}})
@@ -62,7 +65,11 @@ exports.setUsername = [
         // Success
         const user = await prisma.user.update({ //Update the username value;b
             where:{id},
-            data:{username}
+            data:{
+                username,
+                setUsername:true
+            }
+
         })
         const token = generateToken(user.id);
         res.status(200).json({
@@ -79,12 +86,14 @@ exports.loginPost = [
         .trim(),
     body("password")
         .trim()
-        .isLength({min:2,max:35})
-        .withMessage("Password must be between 2-35 characters long"),
+        .isLength({min:3})
+        .withMessage("Password must be at least 3 characters long"),
 
     // validationHandle,
+    
 
     asyncHandler(async(req,res,next)=>{
+        console.log(req.body);
         const {username,password} = req.body;
         const user = await usernameLoginValidation(username,password)
         console.log('was an error thrown?')
@@ -100,7 +109,7 @@ exports.loginPost = [
 exports.signupPost=[
     body("displayName","Invalid display name")
         .trim()
-        .isLength({min:0,max:35}),
+        .isLength({min:2,max:35}),
     body("username")
         .trim()
         .isLength({min:2,max:35})
@@ -109,8 +118,8 @@ exports.signupPost=[
         .withMessage("Username characters must be either alphanumeric, a period, or underscore"),
     body("password")
         .trim()
-        .isLength({min:2,max:35})
-        .withMessage("Password must be between 2-35 characters long"),
+        .isLength({min:3})
+        .withMessage("Password must be at least 3 characters long"),
     body("confirm_password","Confirm pass failed")
         .trim()
         .custom((value, {req}) => value === req.body.password).withMessage("The passwords do not match"),        

@@ -10,6 +10,8 @@ exports.initGet = expressAsyncHandler(async(req,res,next)=>{
         q_top_users(req.user.id)
     ]);
 
+    console.log("sending-feed ",new_post,new_follower_posts,new_users,top_users)
+
     res.status(200).json({new_post,new_follower_posts,new_users,top_users})
 })
 
