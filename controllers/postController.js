@@ -22,17 +22,18 @@ exports.getPost = asyncHandler(async(req,res,next)=>{ //DONE
     const postId = Number(req.params.postId)
     const post = await get_post(postId);
     if (!post) return res.status(404).json({error:`Post if ID:${postId} not found.`})
-    return res.status(200).json(post)  
+    return res.status(200).json({post})  
 })
 
 exports.getFollowingPosts = asyncHandler(async(req,res,next)=>{
     const posts = await get_following_posts(req.user.id);
-    res.status(200).json(posts)
+    res.status(200).json({posts})
 })
 
 exports.createPost = [
     upload.single("attachment"),
     (req,res,next)=>{
+        // console.log("AFTER UPLOAD SINGLE REQBODY:::::",req.body)
         if (!Array.isArray(req.body.tags)){
             req.body.tags = typeof req.body.tags==="undefined"? []:[req.body.tags];
         }
@@ -40,10 +41,11 @@ exports.createPost = [
     },
     body("body")
         .trim()
-        .isLength({min:1})
+        .isLength({min:1,max:2000})
         .withMessage("Text body must not be empty"),
     body("tags.*")
         .trim()
+        .isLength({min:1})
         .toLowerCase(),
         // .escape(), //TODO see what this does, how about no?
     body("gitLink")
@@ -58,15 +60,12 @@ exports.createPost = [
     validationHandle,
     
     asyncHandler(async(req,res,next)=>{
-        console.log("In side post controller: ",req.body)
-
-
         const data = {};
         data.userId = req.user.id;
         data.body = req.body.body
-        console.log("Logging req file",req.file)
-        if (!req.file) throw new myError("file empty",400);
-        if (req.file.mimetype=='raw'){
+        // console.log("Logging req file",req.file)
+        // if (!req.file) throw new myError("file empty",400); //File is optional remove this
+        if (req.file && req.file.mimetype=='raw'){
             throw new myError("Invalid file uploaded",400);
         }
         if (req.file){
@@ -75,7 +74,7 @@ exports.createPost = [
             data.public_id = result.public_id;
         }
         if (req.body.gitLink) data.gitLink = req.body.gitLink
-        if (req.body.repoLink) data.repoLink = req.body.repoLink
+        if (req.body.repoLink) data.repoLink = req.body.repoLink //TODO remove this.
         if (req.body.tags.length>0){
             data.tags = {
                 connectOrCreate: req.body.tags.map(name=>({

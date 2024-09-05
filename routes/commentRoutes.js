@@ -9,6 +9,14 @@ const requireAuth = require("../middleware/requireAuth");
 //Getting all comments in post -> handled by post controller
 //Getting all comments by user -> handled by user controller
 
+router.get("/:commentId",
+    requireAuth,
+    commentExist,
+    controller.getChildComment
+)
+
+
+
 router.delete("/:commentId", //What is the point of this?
     ownCommentAuth,
     controller.deleteComment

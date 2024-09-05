@@ -2,9 +2,38 @@ const {PrismaClient} = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
 const { body } = require("express-validator");
 const myError = require("../lib/myError");
-const { create_comment } = require("../prisma/queries/commentQuery");
+const { create_comment, get_child_comments } = require("../prisma/queries/commentQuery");
 const { validationHandle } = require("../middleware/validationHandle");
 const prisma = new PrismaClient();
+
+exports.getChildComment = asyncHandler(async(req,res,next)=>{
+    //req.comment.id 
+    //Cursor is only needed for second request onwards
+
+    const id = req.comment.id;
+    const cursorId = Number(req.body.cursorId)
+
+    console.log("cursorID",cursorId)
+
+    const comments = await (cursorId? 
+        get_child_comments(id,cursorId):
+        get_child_comments(id))
+
+    console.log(comments);
+    if (comments.length>0){
+        return res.status(200).json({
+            comments,
+            myCursor:comments[comments.length-1].id
+        })
+    } else{
+        return res.status(200).json({comments});
+    }
+
+    // const myCursor = comments? comments[comments.length-1].id: null;
+    // myCu
+    // return res.status(200).json({comments,myCursor})
+    //implement pagination
+})
 
 
 exports.deleteComment = asyncHandler(async(req,res,next)=>{
@@ -32,7 +61,7 @@ exports.postComment = [
     body("postId")
         .trim()
         .isInt(),
-    body("parentComment")
+    body("parentComment") //Optional
         .optional()
         .trim()
         .isNumeric(),

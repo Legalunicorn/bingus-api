@@ -7,9 +7,7 @@
  * 5. populate req.user with info and pass to the next middleware
  */
 
-const jwt = require("jsonwebtoken");
 const {PrismaClient} = require("@prisma/client");
-const prisma = new PrismaClient();
 const asyncHandler = require("express-async-handler");
 const myError = require("../lib/myError");
 const hasAccount = require("./hasAccount")
@@ -25,7 +23,7 @@ const requireAuth =[
             throw new myError("User does not have username",401);
         }
         console.log("===required auth gained =====",req.user.id);
-        console.log("Logging req.body: ",req.body)
+        // console.log("Logging req.body: ",req.body)
         next();
     })
 ]
