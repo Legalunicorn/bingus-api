@@ -20,13 +20,14 @@ exports.getChildComment = asyncHandler(async(req,res,next)=>{
         get_child_comments(id))
 
     console.log(comments);
+    //if comments is null though, i should return an empty cursor
     if (comments.length>0){
         return res.status(200).json({
             comments,
             myCursor:comments[comments.length-1].id
         })
     } else{
-        return res.status(200).json({comments});
+        return res.status(200).json({comments,myCursor:null}); //null -> frontend signals no more replies
     }
 
     // const myCursor = comments? comments[comments.length-1].id: null;
