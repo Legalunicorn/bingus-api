@@ -83,12 +83,26 @@ exports.getFollowing = [
 - 
 */
 exports.patchProfile = [
+
+//MISSING username and displayname
+
     upload.single("attachment"),
     param("userId","invalid user id")
         .trim()
         .isNumeric(),
+    body("username")
+        .trim()
+        .isLength({min:2,max:25})
+        .withMessage("Username bettwen 2-25 characters")
+        .matches(/^[a-zA-Z0-9_.]*$/)
+        .withMessage("Username characters must be either alphanumeric, a period, or underscore"),
+
+    body("displayname")
+        .trim()
+        .isLength({min:2,max:25})
+        .withMessage("Displayname between 2-25 characters."),
     body("bio")
-        .optional()
+        // .optional()
         .trim()
         .isLength({max:350})
         .withMessage("max bio length is 350"),
@@ -98,7 +112,6 @@ exports.patchProfile = [
         .trim()
         .isURL()
         .withMessage("website not valid url"),
-
     body("github")
         .optional()
         .trim()
@@ -113,6 +126,7 @@ exports.patchProfile = [
             where:{userId:req.user.id}
         })
         //
+        console.log("??",req.body)
         const updateData = {}
         console.log("this is req.user now",req.user)
         
@@ -135,11 +149,23 @@ exports.patchProfile = [
             updateData.profilePicture = result.secure_url;
             updateData.pfp_public_id = result.public_id;
         }
+        const mainData = {}
+
+        //should try to find username first
+        if (req.body.username!=req.user.username){
+            const exist = await prisma.user.findUnique({where:{username:req.body.username}})
+            if (exist) next(new myError('Username is already taken',400));
+
+        }
+        
+         mainData.username=req.body.username;
+        mainData.displayName=req.body.displayname;
         if (req.body.bio) updateData.bio = req.body.bio
         if (req.body.github) updateData.github=req.body.github
         if (req.body.website) updateData.website=req.body.website
         
-        const user = await update_user(req.user.id,updateData)
+        //BUG need to redo this. right now we are only updating user
+        const user = await update_user(req.user.id,updateData,mainData);
         res.status(200).json({user})
     })
 ]

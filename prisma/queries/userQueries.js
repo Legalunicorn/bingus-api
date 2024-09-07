@@ -1,6 +1,7 @@
 const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 const {SELECT_USER_BASIC,SELECT_ISUSER_FOLLOWING,SELECT_USER_DETAILED, SELECT_USER_WITH_FOLLOW} = require("./querySnippets")
+const myError = require( "../../lib/myError");
 
 
 async function get_user_basic(id){
@@ -61,20 +62,43 @@ async function followingOrfollowers(isFollowing,id){
     return await followingOrfollowers(true,id);
 }
 
- async function update_user(id,updateData){
-    console.log("UD ID",id)
-    return await prisma.profile.upsert({
-        where:{userId:id},
-        update:updateData,
-        create:{
-            ...updateData,
-            userId:id
+//  async function update_user(id,updateData){
+//     console.log("UD ID",id)
+//     return await prisma.profile.upsert({
+//         where:{userId:id},
+//         update:updateData,
+//         create:{
+//             ...updateData,
+//             userId:id
+//         },
+//         select:{
+//             user:{
+//                 select:SELECT_USER_DETAILED(id)
+//             }
+//         }
+//     })
+// }
+async function update_user(id,profileData,userData){
+
+    return await prisma.user.update({
+        where:{id},
+        data:{
+            ...userData,
+            profile:{
+                update:{
+                    ...profileData
+                }
+            }
         },
-        select:{
-            user:{
-                select:SELECT_USER_DETAILED(userId)
+        include:{
+            profile:{
+                select:{
+                    profilePicture:true
+                }
             }
         }
+
+        
     })
 }
 
