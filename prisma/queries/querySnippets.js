@@ -45,33 +45,36 @@ function SELECT_USER_DETAILED (userId){
     _count:{
         select:{
             followers:true,
-            following:true
+            following:true,
+            posts:true
         }
     },
     profile:{
         select:{
             website:true,
             profilePicture:true,
-            github:true
+            github:true,
+            bio:true,
         }
     },
     posts:{
-        select:{
-            body:true,
-            gitLink:true,
-            repoLink:true,
-            tags:{
-                select:{
-                    name:true
-                }
-            },
-            _count:{
-                select:{
-                    likes:true,
-                    comments:true
-                }
-            }
-        }
+        include:INCLUDE_FEED_POST
+        // select:{
+        //     body:true,
+        //     gitLink:true,
+        //     repoLink:true,
+        //     tags:{
+        //         select:{
+        //             name:true
+        //         }
+        //     },
+        //     _count:{
+        //         select:{
+        //             likes:true,
+        //             comments:true
+        //         }
+        //     }
+        // }
     }
     }
 }

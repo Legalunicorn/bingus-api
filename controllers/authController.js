@@ -20,17 +20,16 @@ exports.googleRedirectGet = [
     //Call passport.authenticate again but this time it has user
     passport.authenticate('google',{session:false}),
     (req,res,next)=>{
-        const user = req.user;
-        if (!user.setUsername){ //because u made a custom username. this wont pass
+        const user = req.user; //README user now has profilepicture access 
+        if (!user.setUsername){
             const token = generateToken(user.id,'10min') //
-            console.log("GENERATED TOK TOK",token)
             return res.redirect(`${process.env.CLIENT_URL}/auth/oauth/setusername?token=${token}`)
-            //username form to point back to different endpoint
         }
+
         //Already registered Gooogle account with username
         const token = generateToken(user.id);
-        console.log("====== google redirect registered =====")
-        res.redirect(`${process.env.CLIENT_URL}/auth/login?token=${token}&username=${user.username}`)
+        // console.log("====== google redirect registered =====")
+        res.redirect(`${process.env.CLIENT_URL}/auth/login?token=${token}&username=${user.username}&id=${user.id}&profilePicture=${user.profile.profilePicture}`)
         
     }
 ]
@@ -68,13 +67,20 @@ exports.setUsername = [
             data:{
                 username,
                 setUsername:true
+            },
+            include:{
+                profile:{
+                    select:{profilePicture:true}
+                }
             }
 
         })
         const token = generateToken(user.id);
         res.status(200).json({
             token,
-            username
+            username,
+            id: user.id,
+            profilePicture:user.profile.profilePicture
         })
     })
 
@@ -93,14 +99,17 @@ exports.loginPost = [
     
 
     asyncHandler(async(req,res,next)=>{
-        console.log(req.body);
+        // console.log(req.body);
         const {username,password} = req.body;
         const user = await usernameLoginValidation(username,password)
-        console.log('was an error thrown?')
         const token = generateToken(user.id);
+
+        //Check if the user has a profile picture
         res.status(200).json({
             token,
-            username: user.username
+            username: user.username,
+            id: user.id,//README changed
+            profilePicture:user.profile.profilePicture
         })
     })
 ]
@@ -132,7 +141,9 @@ exports.signupPost=[
         const token = generateToken(user.id)
         res.status(200).json({
             token,
-            username
+            username,
+            id:user.id,
+            profilePicture:null //new users have no profilepicture //README Changed
         })
     })
 

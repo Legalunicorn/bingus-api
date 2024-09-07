@@ -4,7 +4,16 @@ const bcrypt = require("bcryptjs")
 const myError = require("../lib/myError")
 
  async function usernameLoginValidation(username,password){
-        const user = await prisma.user.findUnique({where:{username}});
+        const user = await prisma.user.findUnique({
+            where:{username},
+            include:{
+                profile:{
+                    select:{
+                        profilePicture:true //incase they have one
+                    }
+                }
+            }
+        });
         if (!user || !bcrypt.compareSync(password,user.hashedPassword)){
             throw new myError("Password or Username is incorrect",401);
         }
@@ -23,7 +32,12 @@ const myError = require("../lib/myError")
         data:{
             username,
             displayName,
-            hashedPassword: encryptPassword(password)
+            hashedPassword: encryptPassword(password),
+            profile:{
+                create:{
+                    profilePicture:process.env.DEFAULT_PFP //README all users will now have a default pfp (no access to delete it)
+                }
+            }
         }
     })
     console.log("= New user created",user)

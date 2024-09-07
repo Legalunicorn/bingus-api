@@ -11,23 +11,27 @@ exports.getChildComment = asyncHandler(async(req,res,next)=>{
     //Cursor is only needed for second request onwards
 
     const id = req.comment.id;
-    const cursorId = Number(req.body.cursorId)
+    const cursorId = Number(req.query.cursorId)
 
     console.log("cursorID",cursorId)
 
-    const comments = await (cursorId? 
+    const replies = await (cursorId && cursorId!==-1? 
         get_child_comments(id,cursorId):
         get_child_comments(id))
 
-    console.log(comments);
+    // console.log(comments);
     //if comments is null though, i should return an empty cursor
-    if (comments.length>0){
+    // console.log("Sending over: ",replies);
+
+    //TODO if cursor
+    if (replies.length>0){
+        console.log("sending cid",replies[replies.length-1].id);
         return res.status(200).json({
-            comments,
-            myCursor:comments[comments.length-1].id
+            replies,
+            cursorId:replies[replies.length-1].id
         })
-    } else{
-        return res.status(200).json({comments,myCursor:null}); //null -> frontend signals no more replies
+    } else{ //no rely? empty replies
+        return res.status(200).json({replies,cursorId:null}); //null -> frontend signals no more replies
     }
 
     // const myCursor = comments? comments[comments.length-1].id: null;

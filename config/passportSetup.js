@@ -22,18 +22,35 @@ passport.use(
                 const displayName = profile.displayName
                 const email = profile.emails[0].value;
                 const googleExist = await  prisma.user.findUnique({
-                    where:{googleId}
+                    where:{googleId},
+                    include:{
+                        profile:{
+                            select:{profilePicture:true}//README added this so frontend does not need to fetch again
+                            //README alternatively, i thought of making the app header do its own fetch to fetch for user information
+                        }
+                    }
                 })
 
                 if (googleExist) return done(null,googleExist) //Registered google user
 
                 const emailExist = await prisma.user.findUnique({where:{email}})
+                //BUG email is no longer a required valid field
+                //Thus if we done have email this will not exist
+                // but if we allow users to store their email then yeah this will be a problem
+                // and we still need this step
                 if (emailExist){ 
                     //We override and give access to email registered account
-                    const updatedUser = await prisma.user.update({
+                    //Because this has unintended consequences, we should varify email
+                    const updatedUser = await prisma.user.update({ //dont update their profilepicture or do..?
+                        //if we update their pfp we can be sure to have one
                         where:{email},
-                        data:{googleId}
-                    })
+                        data:{googleId},
+                        include:{
+                            profile:{
+                                select:{profilePicture:true}
+                            }
+                        }
+                    }) //verdict: we dont update. 
                     return done(null,updatedUser)
                 }
 
@@ -47,7 +64,7 @@ passport.use(
                         displayName,
                         email,
                         googleId,
-                        username,
+                        username, //Default username
                         profile:{
                             create:{
                                 profilePicture:profile.photos[0].value

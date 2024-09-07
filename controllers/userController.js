@@ -36,6 +36,8 @@ exports.getUserDetails = [
         if (user===null){
             return res.status(404).json({error:`User with od:${id} not found.`})
         } else{
+            //check if userId is following and make the data presentable
+            user.isBeingFollowed= user.followers.length>0;
             res.status(200).json({user});
         }
         //get users, if empty throw 404
