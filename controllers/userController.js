@@ -14,16 +14,6 @@ exports.getAllUsers = asyncHandler(async(req,res,next)=>{
     res.status(200).json({users})
 })
 
-/**
- * Scope
- * - get all the profile
- * - get all the POST
- * - get all following/followers
- * 
- * undecided:
- *  get comments(?) and likes(?)
- * 
- */
 exports.getUserDetails = [
     param("userId")
         .trim()
@@ -44,6 +34,17 @@ exports.getUserDetails = [
     })
 
 ]
+
+// exports.getProfileSelf = [
+//     param("userId")
+//         .trim()
+//         .isNumeric(),
+
+//     asyncHandler(async(req,res,next)=>{
+//         const id = Number(req.params.userId)
+
+//     })
+// ]
 
 exports.getFollowers = [
     param("userId")

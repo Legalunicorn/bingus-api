@@ -16,6 +16,13 @@ router.get("/:userId", //DONE
     controller.getUserDetails
 )
 
+router.get("/profle/:userId",
+    ownAccountAuth,
+    controller.getUserDetails //same endpoint but different security
+)
+
+
+
 // GET - get followers of user
 router.get("/:userId/followers",
     controller.getFollowers
