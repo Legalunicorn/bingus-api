@@ -38,7 +38,7 @@ exports.googleRedirectGet = [
 exports.setUsername = [
     body("username")
         .trim()
-        .isLength({min:2,max:35})
+        .isLength({min:2,max:25})
         .withMessage("Username betwen 2-35 characters")
         .matches(/^[a-zA-Z0-9_.]*$/),
 
@@ -118,10 +118,10 @@ exports.loginPost = [
 exports.signupPost=[
     body("displayName","Invalid display name")
         .trim()
-        .isLength({min:2,max:35}),
+        .isLength({min:2,max:25}), //updated maxlength fro m35 to 25 due to UI constraints
     body("username")
         .trim()
-        .isLength({min:2,max:35})
+        .isLength({min:2,max:25})
         .withMessage("Username betwen 2-35 characters")
         .matches(/^[a-zA-Z0-9_.]*$/)
         .withMessage("Username characters must be either alphanumeric, a period, or underscore"),

@@ -16,7 +16,7 @@ router.get("/:userId", //DONE
     controller.getUserDetails
 )
 
-router.get("/profle/:userId",
+router.get("/profile/:userId",
     ownAccountAuth,
     controller.getUserDetails //same endpoint but different security
 )
