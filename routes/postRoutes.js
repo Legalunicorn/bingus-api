@@ -4,10 +4,14 @@ const requireAuth = require("../middleware/requireAuth")
 const ownPostAuth = require("../middleware/ownPostAuth")
 
 //Get all POST by recency, OPTIONAL: user 
-router.get("/",controller.getManyPosts) //DONE
+router.get("/",
+    requireAuth,
+    controller.getManyPosts) //DONE
 
 // GET a single POST with comments data
-router.get("/single/:postId",controller.getPost) //DONE
+router.get("/single/:postId",
+    requireAuth,
+    controller.getPost) //DONE
 
 // GET a post by users who userId is following
 router.get("/following", //DONE

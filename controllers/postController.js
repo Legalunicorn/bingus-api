@@ -11,7 +11,7 @@ const upload = require("../config/multer")
 
 exports.getManyPosts = asyncHandler(async(req,res,next)=>{ //DONE, actually why did i make this for? the feed will ge tall post no?
     const userId = Number(req.query.userId); //user if valid 
-    const posts = await (userId? user_posts(userId): all_posts()); //depends if userId was supplied in query
+    const posts = await (userId? user_posts(userId,req.user.id): all_posts(req.user.id)); //depends if userId was supplied in query
     //Debugging
     console.log("getPosts user: ",userId)
     console.log(posts)
@@ -20,7 +20,7 @@ exports.getManyPosts = asyncHandler(async(req,res,next)=>{ //DONE, actually why 
 
 exports.getPost = asyncHandler(async(req,res,next)=>{ //DONE
     const postId = Number(req.params.postId)
-    const post = await get_post(postId);
+    const post = await get_post(postId,req.user.id);
     if (!post) return res.status(404).json({error:`Post if ID:${postId} not found.`})
     return res.status(200).json({post})  
 })
@@ -182,7 +182,7 @@ exports.updatePost = [
             }
         }
 
-        const post = await update_post(postId,postData);
+        const post = await update_post(postId,postData,req.user.id);
         res.status(200).json({post})
 
     })
@@ -193,7 +193,7 @@ exports.likePost = asyncHandler(async(req,res,next)=>{
     //check if post exist //TODO make exist a middleware
     const postId = Number(req.params.postId)
     const exist = await prisma.post.findUnique({where:{id:postId}})
-    console.log("exist",exist);
+    // console.log("exist",exist);
     if (!exist) return res.status(404).json({error:`Post ${postId} does not exist`});
     const result = await prisma.postLike.upsert({
         where:{
@@ -209,7 +209,11 @@ exports.likePost = asyncHandler(async(req,res,next)=>{
 
         }
     })
+    console.log("Result of like: ",result)
+    console.log("***")
     const post = await get_post(postId)
+
+    // console.log("post is now:",post)
     return res.status(200).json({post})
  })
 
@@ -225,6 +229,8 @@ exports.likePost = asyncHandler(async(req,res,next)=>{
         
         },
     })
+    console.log("unlike result: ",result);
+    console.log("***")
     const post = await get_post(postId)
     return res.status(200).json({post});
  })

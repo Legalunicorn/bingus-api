@@ -6,9 +6,9 @@ const { SELECT_USER_BASIC,INCLUDE_FEED_POST,INCLUDE_SINGLE_POST } = require("./q
 //TODO figure out for ech post, if the user has liked the post before or not
 
 
- async function all_posts(){
+ async function all_posts(currUserId){
     const posts = await prisma.post.findMany({ 
-        include:INCLUDE_FEED_POST
+        include:INCLUDE_FEED_POST(currUserId)
         ,
         orderBy:{
             createdAt:'desc'
@@ -17,9 +17,9 @@ const { SELECT_USER_BASIC,INCLUDE_FEED_POST,INCLUDE_SINGLE_POST } = require("./q
     return posts;
 }
 
- async function user_posts(id){
+ async function user_posts(id,currUserId){
     const posts = await prisma.post.findMany({ 
-        include:INCLUDE_FEED_POST,
+        include:INCLUDE_FEED_POST(currUserId),
         where:{
             userId:id
         },
@@ -31,18 +31,18 @@ const { SELECT_USER_BASIC,INCLUDE_FEED_POST,INCLUDE_SINGLE_POST } = require("./q
 }
 
 
- async function get_post(id){ 
+ async function get_post(id,currUserId){ 
     const post = await prisma.post.findUnique({
         where:{
             id
         },
-        include:INCLUDE_SINGLE_POST
+        include:INCLUDE_SINGLE_POST(currUserId)
     })
     return post;
 }
 
- async function get_following_posts(userId){
-    console.log(userId)
+ async function get_following_posts(currUserId){
+    console.log(currUserId)
     
     const posts = await prisma.post.findMany({
         //the author of the post is being followed by x user Id
@@ -50,12 +50,12 @@ const { SELECT_USER_BASIC,INCLUDE_FEED_POST,INCLUDE_SINGLE_POST } = require("./q
             author:{ //where the POSTER of the post
                 followers:{
                     some:{
-                        followerId:userId
+                        followerId:currUserId
                     }
                 }
             }
         },
-        include:INCLUDE_FEED_POST,
+        include:INCLUDE_FEED_POST(currUserId),
         orderBy:{
             createdAt:'desc'
         }
@@ -97,11 +97,11 @@ async function create_post(reqData){
 
 
 
-async function update_post(id,postData){
+async function update_post(postId,postData,currUserId){
     return await prisma.$transaction(async(tx)=>{
         if (postData.tags){ //If we are to update tags, we delete all exiting relations
             await tx.post.update({
-                where:{id},
+                where:{id:postId},
                 data:{
                     tags:{
                         set:[]
@@ -111,11 +111,11 @@ async function update_post(id,postData){
         }
 
         const post = await tx.post.update({
-            where:{id},
+            where:{id:postId},
             data:{
                 ...postData,
             },
-            include:INCLUDE_FEED_POST
+            include:INCLUDE_FEED_POST(currUserId)
         })
 
         return post;

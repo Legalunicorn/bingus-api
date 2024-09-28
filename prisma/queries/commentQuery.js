@@ -3,7 +3,7 @@ const { SELECT_USER_BASIC } = require("./querySnippets");
 const prisma = new PrismaClient();
 
 
-async function get_child_comments(id,myCursor){
+async function get_child_comments(id,currUserId,myCursor){
     return await prisma.comment.findMany({
 
         take:4, //TODO change to 5, 3 is for testing
@@ -14,6 +14,7 @@ async function get_child_comments(id,myCursor){
             id:true,
             body:true,
             createdAt:true,
+            parentCommentId:true,
             _count:{
                 select:{
                     likes:true
@@ -21,7 +22,11 @@ async function get_child_comments(id,myCursor){
             },
             user:{
                 select: SELECT_USER_BASIC
-            }
+            },
+            likes:{
+                where:{userId:currUserId}
+            },
+            
         },
         orderBy:{
             createdAt:'asc'

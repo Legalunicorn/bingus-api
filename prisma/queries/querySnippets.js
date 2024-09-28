@@ -31,15 +31,16 @@
 }
 
 //README a detailed user profile, need data whether youre following or not
-function SELECT_USER_DETAILED (userId){
+function SELECT_USER_DETAILED (currUserId){ //THis needs a second param for
     return {
     id:true,
     displayName:true,
     username:true,
     createdAt:true,
+    //README Logic to check if currUserId is following x user
     followers:{
         where:{
-            followerId: (userId)
+            followerId: (currUserId)
         }
     },
     _count:{
@@ -58,23 +59,7 @@ function SELECT_USER_DETAILED (userId){
         }
     },
     posts:{
-        include:INCLUDE_FEED_POST
-        // select:{
-        //     body:true,
-        //     gitLink:true,
-        //     repoLink:true,
-        //     tags:{
-        //         select:{
-        //             name:true
-        //         }
-        //     },
-        //     _count:{
-        //         select:{
-        //             likes:true,
-        //             comments:true
-        //         }
-        //     }
-        // }
+        include:INCLUDE_FEED_POST(currUserId)
     }
     }
 }
@@ -87,27 +72,40 @@ function SELECT_USER_DETAILED (userId){
 
 
 //README basic  about posts for the feed 
-const INCLUDE_FEED_POST = {
+function INCLUDE_FEED_POST(userId){
+    return{
+        _count:{
+            select:{
+                likes:true,
+                comments:true,
+            }
+        },
+        tags:{
+            select:{name:true}
+        },
+        author:{
+            select:SELECT_USER_BASIC
+        },
+        likes:{
+            where:{
+                userId:userId
+            }
+        }
+    }
+}
+
+//README information about a focused post (ie, comments and everything)
+function INCLUDE_SINGLE_POST(currUserId){
+    return{
     _count:{
         select:{
             likes:true,
             comments:true,
         }
     },
-    tags:{
-        select:{name:true}
-    },
-    author:{
-        select:SELECT_USER_BASIC
-    }
-}
-
-//README information about a focused post (ie, comments and everything)
-const INCLUDE_SINGLE_POST ={
-    _count:{
-        select:{
-            likes:true,
-            comments:true,
+    likes:{
+        where:{
+            userId:currUserId
         }
     },
     tags:{
@@ -133,6 +131,13 @@ const INCLUDE_SINGLE_POST ={
             user:{
                 select:SELECT_USER_BASIC
             },
+            likes:{ //Field to indicate whether current user has liked comment
+                where:{
+                    userId:currUserId
+                }
+            },
+            
+            //TODO comment this entire section out
             childComment:{
                 select:{
                     id:true,
@@ -156,6 +161,7 @@ const INCLUDE_SINGLE_POST ={
         orderBy:{
             createdAt:'desc'
         }
+    }
     }
 }
 

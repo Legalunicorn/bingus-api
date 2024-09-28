@@ -16,8 +16,8 @@ exports.getChildComment = asyncHandler(async(req,res,next)=>{
     console.log("cursorID",cursorId)
 
     const replies = await (cursorId && cursorId!==-1? 
-        get_child_comments(id,cursorId):
-        get_child_comments(id))
+        get_child_comments(id,req.user.id,cursorId):
+        get_child_comments(id,req.user.id))
 
     // console.log(comments);
     //if comments is null though, i should return an empty cursor

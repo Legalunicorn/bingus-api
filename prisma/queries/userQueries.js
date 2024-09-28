@@ -28,10 +28,10 @@ async function get_user_basic(id){
     })
 }
 
- async function get_user_details(id,userId){
+ async function get_user_details(id,currUserId){
     return  await prisma.user.findUnique({
         where:{id},
-        select:SELECT_USER_DETAILED(userId)
+        select:SELECT_USER_DETAILED(currUserId)
     })
 }
 /**

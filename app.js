@@ -43,6 +43,7 @@ app.use(function(req, res, next) {
 
 app.use((err,req,res,next)=>{
   console.log(`$Error: ${err.message} ${err.status || 'no status'}`)
+  console.log();
   console.log("======== ERR STACK ========")
   console.log(err.stack);
   

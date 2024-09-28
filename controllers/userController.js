@@ -22,7 +22,7 @@ exports.getUserDetails = [
     asyncHandler(async(req,res,next)=>{
         // const id = Number(req.user.id);//
         const id = Number(req.params.userId);
-        const user = await get_user_details(id,req.user.id);
+        const user = await get_user_details(id,req.user.id); //id -> paramuser, secondparm -> CurrUser
         if (user===null){
             return res.status(404).json({error:`User with od:${id} not found.`})
         } else{
@@ -108,12 +108,12 @@ exports.patchProfile = [
         .withMessage("max bio length is 350"),
 
     body("website") 
-        .optional()
+        .optional({nullable: true, checkFalsy: true})
         .trim()
         .isURL()
         .withMessage("website not valid url"),
     body("github")
-        .optional()
+        .optional({nullable: true, checkFalsy: true})
         .trim()
         .isURL()
         .withMessage("github not valid url"),
