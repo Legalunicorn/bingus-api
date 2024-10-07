@@ -1,16 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
-
-// generator dbml {
-//   provider = "prisma-dbml-generator"
-// }
 
 datasource db {
   provider = "postgresql"
@@ -18,27 +9,42 @@ datasource db {
 }
 
 model User {
-  id               Int           @id @default(autoincrement())
-  displayName      String        @map("display_name")
-  username         String?       @unique
-  email            String?       @unique
-  googleId         String?       @unique @map("google_id")
-  hashedPassword   String?       @map("hashed_password")
-  setUsername      Boolean       @default(true) //Added this field to check for oauth users first passord set
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  comments         Comment[]
-  posts            Post[]
-  postLikes        PostLike[]
-  commentLikes     CommentLike[]
-  followers        Follow[]      @relation("UserFollowers")
-  following        Follow[]      @relation("UserFollowing")
-  sentMessages     Message[]     @relation("sentMessages")
-  receivedMessages Message[]     @relation("receivedMessages")
-  profile          Profile?
-  setting          UserSetting?
+  id             Int           @id @default(autoincrement())
+  displayName    String        @map("display_name")
+  username       String?       @unique
+  email          String?       @unique
+  googleId       String?       @unique @map("google_id")
+  hashedPassword String?       @map("hashed_password")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  setUsername    Boolean       @default(true)
+  commentLikes   CommentLike[]
+  comments       Comment[]
+  following      Follow[]      @relation("UserFollowing")
+  followers      Follow[]      @relation("UserFollowers")
+  // receivedMessages Message[]     @relation("receivedMessages")
+  sentMessages   Message[]     @relation("sentMessages")
+  //I dont intend to allow group chats, only DM so userA userB is succicient, dont need a seperate table
+  userA          Chat[]        @relation("userA")
+  userB          Chat[]        @relation("userB")
+  posts          Post[]
+  postLikes      PostLike[]
+  profile        Profile?
+  setting        UserSetting?
 
   @@map("user")
+}
+
+model Chat {
+  id      Int       @id @default(autoincrement())
+  userA   User      @relation("userA", fields: [userAId], references: [id], onDelete: Cascade)
+  userAId Int
+  userB   User      @relation("userB", fields: [userBId], references: [id], onDelete: Cascade)
+  userBId Int
+  message Message[]
+
+  @@unique([userAId, userBId])
+  @@map("chat")
 }
 
 model Profile {
@@ -65,30 +71,22 @@ model UserSetting {
   @@map("user_setting")
 }
 
-//TODO notification model
-//receiverID
-// senderID? who gave the notification
-//postId?
-//commentId?
-//messageId?
-//isRead
-
 model Post {
   id         Int        @id @default(autoincrement())
   body       String     @default("")
   gitLink    String?
   repoLink   String?
   attachment String?
-  public_id  String? //for attachment id on cloudinary
+  public_id  String?
   createdAt  DateTime   @default(now())
   nextPostId Int?
-  nextPost   Post?      @relation("PostSequal", fields: [nextPostId], references: [id], onDelete: SetNull)
-  prevPost   Post[]     @relation("PostSequal")
-  author     User       @relation(fields: [userId], references: [id], onDelete: Cascade) //deleting user deletes all their posts
   userId     Int
-  tags       Tag[]
-  likes      PostLike[]
   comments   Comment[]
+  nextPost   Post?      @relation("PostSequal", fields: [nextPostId], references: [id])
+  prevPost   Post[]     @relation("PostSequal")
+  author     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes      PostLike[]
+  tags       Tag[]      @relation("PostToTag")
 
   @@map("post")
 }
@@ -97,25 +95,24 @@ model Comment {
   id              Int           @id @default(autoincrement())
   body            String
   createdAt       DateTime      @default(now())
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          Int
-  likes           CommentLike[]
   parentCommentId Int?
+  postId          Int
+  likes           CommentLike[]
   parentComment   Comment?      @relation("CommentParent", fields: [parentCommentId], references: [id], onDelete: Cascade)
   childComment    Comment[]     @relation("CommentParent")
-  postId          Int
-  post            Post          @relation(fields: [postId], references: [id], onDelete: Cascade) //deleting post deletes all comments
+  post            Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }
 
 model PostLike {
-  id Int @id @default(autoincrement())
-
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int  @id @default(autoincrement())
   userId Int
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
   @@map("post_likes")
@@ -123,10 +120,10 @@ model PostLike {
 
 model CommentLike {
   id        Int     @id @default(autoincrement())
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId Int
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, commentId])
   @@map("comment_likes")
@@ -135,35 +132,32 @@ model CommentLike {
 model Tag {
   id    Int    @id @default(autoincrement())
   name  String @unique
-  posts Post[]
+  posts Post[] @relation("PostToTag")
 
   @@map("tag")
 }
 
 model Message {
-  id         Int      @id @default(autoincrement())
-  content    String
-  createdAt  DateTime @default(now())
-  senderId   Int
-  receiverId Int
-  sender     User     @relation("sentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver   User     @relation("receivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  senderId  Int
+  // receiverId Int
+  // receiver   User     @relation("receivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender    User     @relation("sentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  chatId    Int
+  chat      Chat     @relation(fields: [chatId], references: [id])
 
   @@map("message")
 }
 
-//Dont need this, but this is an explicit relation table that would automatically be created
-// by prisma if i didnt define the self many-to-many relationship between users
-// i made my own so i could specify the created at 
 model Follow {
-  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
-  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
   followingId Int
   followerId  Int
   createdAt   DateTime @default(now())
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@id([followerId, followingId], name: "id")
   @@map("follow")
 }
-
-//Didnt add relation table for Many-to-many POST-TAGS

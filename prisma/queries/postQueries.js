@@ -42,7 +42,6 @@ const { SELECT_USER_BASIC,INCLUDE_FEED_POST,INCLUDE_SINGLE_POST } = require("./q
 }
 
  async function get_following_posts(currUserId){
-    console.log(currUserId)
     
     const posts = await prisma.post.findMany({
         //the author of the post is being followed by x user Id
@@ -63,6 +62,22 @@ const { SELECT_USER_BASIC,INCLUDE_FEED_POST,INCLUDE_SINGLE_POST } = require("./q
     // console.log("posts are",posts)
 
     return posts
+}
+
+async function get_liked_posts(currUserId){
+    return await prisma.post.findMany({
+        where:{
+            likes:{
+                some:{
+                    userId:currUserId
+                }
+            }
+        },
+        include: INCLUDE_FEED_POST(currUserId),
+        orderBy:{
+            createdAt:'desc'
+        }
+    })
 }
 
 
@@ -131,7 +146,8 @@ module.exports = {
     get_following_posts,
     create_post,
     delete_post,
-    update_post
+    update_post,
+    get_liked_posts
 };
 
 //READ ME these are the st

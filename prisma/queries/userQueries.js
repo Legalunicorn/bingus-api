@@ -4,7 +4,7 @@ const {SELECT_USER_BASIC,SELECT_ISUSER_FOLLOWING,SELECT_USER_DETAILED, SELECT_US
 const myError = require( "../../lib/myError");
 
 
-async function get_user_basic(id){
+async function get_user_basic(id){ //TODO check if this was ever used
     return await prisma.user.findUnique({
         where:{id},
         select:{
@@ -20,11 +20,22 @@ async function get_user_basic(id){
     })
 }
 
- async function get_all_users(){ //README  deleete this if not used
+ async function get_all_users(currUser,search){ //README  deleete this if not used
     //consider having an option for more user details,
     // such as followers or following
     return await prisma.user.findMany({
-        select:SELECT_USER_BASIC
+        select:SELECT_USER_WITH_FOLLOW(currUser),
+        where: search? {
+            OR:[
+                {
+                    username:{contains:search}
+                },
+                {
+                    displayName:{contains:search}
+                }
+            ]
+        }:undefined
+
     })
 }
 
@@ -62,22 +73,6 @@ async function followingOrfollowers(isFollowing,id){
     return await followingOrfollowers(true,id);
 }
 
-//  async function update_user(id,updateData){
-//     console.log("UD ID",id)
-//     return await prisma.profile.upsert({
-//         where:{userId:id},
-//         update:updateData,
-//         create:{
-//             ...updateData,
-//             userId:id
-//         },
-//         select:{
-//             user:{
-//                 select:SELECT_USER_DETAILED(id)
-//             }
-//         }
-//     })
-// }
 async function update_user(id,profileData,userData){
 
     return await prisma.user.update({

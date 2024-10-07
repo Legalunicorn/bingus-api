@@ -7,6 +7,7 @@ const requireAuth = require("../middleware/requireAuth");
 
 //GET - all the users -> inputs id
 router.get("/", //DONE
+    requireAuth,
     controller.getAllUsers
 )
 

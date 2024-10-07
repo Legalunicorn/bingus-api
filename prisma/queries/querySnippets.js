@@ -16,17 +16,24 @@
 //README pass in userID to see if retrived users is followed by userId
  function SELECT_USER_WITH_FOLLOW (userId) {
     
-    item = {
+    item = 
+    {
         ...SELECT_USER_BASIC,
-        _count:{
-        select:{
-            followers:{
-                where:{
-                    followerId:userId
-                }
+        // _count:{
+        //         select:{
+        //             followers:{
+        //                 where:{followerId:userId}
+        //                 }
+        //             }
+        //         }
+        
+        followers:{
+            where:{
+                followerId:userId
             }
         }
-    }}
+        
+    }
     return item;
 }
 
@@ -40,7 +47,7 @@ function SELECT_USER_DETAILED (currUserId){ //THis needs a second param for
     //README Logic to check if currUserId is following x user
     followers:{
         where:{
-            followerId: (currUserId)
+            followerId:currUserId
         }
     },
     _count:{
@@ -59,7 +66,8 @@ function SELECT_USER_DETAILED (currUserId){ //THis needs a second param for
         }
     },
     posts:{
-        include:INCLUDE_FEED_POST(currUserId)
+        include:INCLUDE_FEED_POST(currUserId),
+        orderBy:{createdAt:'desc'}
     }
     }
 }
@@ -86,7 +94,7 @@ function INCLUDE_FEED_POST(userId){
         author:{
             select:SELECT_USER_BASIC
         },
-        likes:{
+        likes:{ //relation 
             where:{
                 userId:userId
             }

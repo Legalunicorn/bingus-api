@@ -1,6 +1,6 @@
 const {PrismaClient} = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
-const {user_posts, all_posts, get_post, get_following_posts, create_post, delete_post, update_post } = require("../prisma/queries/postQueries");
+const {user_posts, all_posts, get_post, get_following_posts, create_post, delete_post, update_post, get_liked_posts } = require("../prisma/queries/postQueries");
 const { body } = require("express-validator");
 const prisma = new PrismaClient();
 const {validationHandle} = require("../middleware/validationHandle")
@@ -27,6 +27,11 @@ exports.getPost = asyncHandler(async(req,res,next)=>{ //DONE
 
 exports.getFollowingPosts = asyncHandler(async(req,res,next)=>{
     const posts = await get_following_posts(req.user.id);
+    res.status(200).json({posts})
+})
+
+exports.getLikedPosts = asyncHandler(async(req,res,next)=>{
+    const posts = await get_liked_posts(req.user.id);
     res.status(200).json({posts})
 })
 

@@ -18,6 +18,12 @@ router.get("/following", //DONE
     requireAuth,
     controller.getFollowingPosts
 )
+
+router.get("/likes",
+    requireAuth,
+    controller.getLikedPosts
+)
+
 // POST a new post
 router.post("/", //DONE
     requireAuth,

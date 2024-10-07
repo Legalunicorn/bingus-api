@@ -10,7 +10,13 @@ const prisma = new PrismaClient();
 
 
 exports.getAllUsers = asyncHandler(async(req,res,next)=>{
-    const users = await get_all_users();
+    //Add query
+    const search = req.query.search;
+    console.log("search is : ",search)
+    const currUser = req.user.id
+    const users = await (search? get_all_users(currUser,search): get_all_users(currUser));
+    //
+    // const users = await get_all_users();
     res.status(200).json({users})
 })
 
@@ -27,24 +33,17 @@ exports.getUserDetails = [
             return res.status(404).json({error:`User with od:${id} not found.`})
         } else{
             //check if userId is following and make the data presentable
-            user.isBeingFollowed= user.followers.length>0;
+            //have to perform this across all functions that return whether a user is being followed or not 
+            // user.isBeingFollowed= user.followers.length>0;
             res.status(200).json({user});
         }
         //get users, if empty throw 404
     })
 
+    
+
 ]
 
-// exports.getProfileSelf = [
-//     param("userId")
-//         .trim()
-//         .isNumeric(),
-
-//     asyncHandler(async(req,res,next)=>{
-//         const id = Number(req.params.userId)
-
-//     })
-// ]
 
 exports.getFollowers = [
     param("userId")
