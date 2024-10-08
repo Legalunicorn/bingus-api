@@ -42,6 +42,7 @@ model Chat {
   userB   User      @relation("userB", fields: [userBId], references: [id], onDelete: Cascade)
   userBId Int
   message Message[]
+  lastMessageAt DateTime @default(now())
 
   @@unique([userAId, userBId])
   @@map("chat")

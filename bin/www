@@ -8,6 +8,10 @@ var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
 
+//README add integration for socket programming
+const socketIO = require("socket.io");
+const socketHandler = require("../socket/socketHandler")
+
 /**
  * Get port from environment and store in Express.
  */
@@ -20,6 +24,10 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+//README attack socketio to server
+const io = socketIO(server);
+socketHandler(io);
 
 /**
  * Listen on provided port, on all network interfaces.
