@@ -7,27 +7,34 @@ module.exports = (io)=>{
         console.log("A user has connected. socket ID: ",socket.id)
 
         socket.on("join_DM",(chatId)=>{
+            console.log("Chat ID joined: ",chatId)
             socket.join(chatId);
         });
 
-        socket.on("send message",async({chatId,input,currUserId})=>{
+        socket.on("send message",async({chatId,input,senderId})=>{
+            console.log("=======messsage is sending===========")
             //sends a message 
             if (input){
                 try{    
                     const message = await prisma.message.create({
                         data:{
                             content:input,
-                            senderId:currUserId,
-                            chatId
+                            senderId,
+                            chatId:Number(chatId)
                         },
                     })
 
-                    //emit the message to all users 
-                    socket.to(chatId).emit("receive messsage",message)
+                    //emit the message to all users
+                    const data = {...message,fromUser:false}; //cannot send message to ownself
+                    console.log("data is: ",data)
+                    socket.broadcast.to(chatId).emit("receive message",data)
 
                     await prisma.chat.update({ 
-                        where:{id:chatId},
-                        data:{lastMessageAt:new Date()}
+                        where:{id:Number(chatId)},
+                        data:{
+                            lastMessageAt:new Date(),
+                            lastMessage: input
+                        }
                     })
                 } catch(error){
                     //TODO deal with error , maybe emit it back

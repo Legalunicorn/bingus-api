@@ -15,6 +15,12 @@ router.get("/:chatId",
     controller.getDM
 )
 
+router.put("/user/:userId",
+    requireAuth,
+    controller.putChat
+
+)
+
 
 // // Not important
 // router.delete("/:chatId") //delete records between two users

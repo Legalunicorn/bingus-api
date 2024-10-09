@@ -22,7 +22,7 @@ async function get_user_chats(currUserId){
 async function get_chat_messages(chatId){
     return await prisma.message.findMany({
         where:{chatId},
-        orderBy:{createdAt:'desc'}, //double check asc or desc
+        orderBy:{createdAt:'asc'}, //double check asc or desc
         //take:50 -> load recent 50 messages? 
     })
 }

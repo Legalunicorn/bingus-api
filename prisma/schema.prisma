@@ -43,6 +43,7 @@ model Chat {
   userBId Int
   message Message[]
   lastMessageAt DateTime @default(now())
+  lastMessage String @default("")
 
   @@unique([userAId, userBId])
   @@map("chat")

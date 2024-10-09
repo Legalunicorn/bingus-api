@@ -26,7 +26,12 @@ app.set('port', port);
 var server = http.createServer(app);
 
 //README attack socketio to server
-const io = socketIO(server);
+const io = socketIO(server,{
+  cors:{
+    origin: process.env.CLIENT_URL,
+    methods:['GET','POST','PUT']
+  }
+});
 socketHandler(io);
 
 /**
