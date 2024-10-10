@@ -14,7 +14,9 @@ const myError = require("../lib/myError")
                 }
             }
         });
-        if (!user || !bcrypt.compareSync(password,user.hashedPassword)){
+        console.log(password,"===");
+        if (user) console.log(user.hashedPassword);
+        if (!user || !user.hashedPassword || !bcrypt.compareSync(password,user.hashedPassword)){
             throw new myError("Password or Username is incorrect",401);
         }
         return user;

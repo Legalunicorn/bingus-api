@@ -6,7 +6,6 @@ const ownAccountAuth = [
     requireAuth,
     asyncHandler(async(req,res,next)=>{
         const userId = Number(req.params.userId);
-        console.log("br",userId,req.user.id);
         if (userId!=req.user.id){
             throw new myError("Authorization Failed: ownAccountAuth",401)
         } 

@@ -24,10 +24,10 @@ const update = async()=>{
             }
         })
     
-        console.log(message)
+        // console.log(message)
 
     } catch(err){
-        console.log(err)
+        // console.log(err)
     }
 
 

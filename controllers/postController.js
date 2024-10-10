@@ -12,9 +12,7 @@ const upload = require("../config/multer")
 exports.getManyPosts = asyncHandler(async(req,res,next)=>{ //DONE, actually why did i make this for? the feed will ge tall post no?
     const userId = Number(req.query.userId); //user if valid 
     const posts = await (userId? user_posts(userId,req.user.id): all_posts(req.user.id)); //depends if userId was supplied in query
-    //Debugging
-    console.log("getPosts user: ",userId)
-    console.log(posts)
+    // console.log(posts)
     res.status(200).json({posts})
 })
 
@@ -68,8 +66,6 @@ exports.createPost = [
         const data = {};
         data.userId = req.user.id;
         data.body = req.body.body
-        // console.log("Logging req file",req.file)
-        // if (!req.file) throw new myError("file empty",400); //File is optional remove this
         if (req.file && req.file.mimetype=='raw'){
             throw new myError("Invalid file uploaded",400);
         }
@@ -96,14 +92,12 @@ exports.createPost = [
 exports.deletePost = asyncHandler(async(req,res,next)=>{ 
     //Middleware has checked the req.user is the owner of postId
     const post = req.post;
-    console.log("del post:",post);
     if (post.attachment && post.public_id){ //not null
-        console.log("has attachkment")
         const [file,result] = await Promise.all([
             delete_post(post.id),
             deleteFile(post.public_id)
         ])
-        console.log("Result from cloudinary file deletion: ",result)
+        // console.log("Result from cloudinary file deletion: ",result)
         return res.status(200).json({file});
     } else{ //no need to delete from cloudinary
         const file = await delete_post(post.id);
@@ -195,10 +189,8 @@ exports.updatePost = [
 ]
 
 exports.likePost = asyncHandler(async(req,res,next)=>{
-    //check if post exist //TODO make exist a middleware
     const postId = Number(req.params.postId)
     const exist = await prisma.post.findUnique({where:{id:postId}})
-    // console.log("exist",exist);
     if (!exist) return res.status(404).json({error:`Post ${postId} does not exist`});
     const result = await prisma.postLike.upsert({
         where:{
@@ -214,11 +206,9 @@ exports.likePost = asyncHandler(async(req,res,next)=>{
 
         }
     })
-    console.log("Result of like: ",result)
-    console.log("***")
+    // console.log("Result of like: ",result)
     const post = await get_post(postId)
 
-    // console.log("post is now:",post)
     return res.status(200).json({post})
  })
 
@@ -234,8 +224,7 @@ exports.likePost = asyncHandler(async(req,res,next)=>{
         
         },
     })
-    console.log("unlike result: ",result);
-    console.log("***")
+    // console.log("unlike result: ",result);
     const post = await get_post(postId)
     return res.status(200).json({post});
  })

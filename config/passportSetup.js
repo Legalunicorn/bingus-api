@@ -16,7 +16,7 @@ passport.use(
         async(accessToken,refreshToken,profile,done)=>{
             try{
             //for now we ignore the access and refresh token
-                console.log(profile); //profile.photos[0].value
+                // console.log(profile); //profile.photos[0].value
 
                 const googleId = profile.id;
                 const displayName = profile.displayName
@@ -76,7 +76,7 @@ passport.use(
                 return done(null,newUser)
 
             } catch(err){
-                console.log("GOOGLE STAT ERR:")
+                // console.log("GOOGLE STAT ERR:")
                 return done(err)
             }
         }

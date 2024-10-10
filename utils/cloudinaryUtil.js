@@ -23,7 +23,7 @@ const cloudinary = require("../config/cloudinary")
  async function deleteFile(public_id){
     
     result = await cloudinary.uploader.destroy(public_id)
-    console.log("DELTED:",result);
+    // console.log("DELTED:",result);
 }
 
 module.exports ={

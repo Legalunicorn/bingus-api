@@ -50,7 +50,7 @@ exports.setUsername = [
         
         const {username} = req.body;
         const id = req.user.id;
-        console.log("modify id ",id)
+        // console.log("modify id ",id)
         const [existId,existUser] = await Promise.all([ //check for pre-existing usernames
             prisma.user.findUnique({where:{id}}),
             prisma.user.findUnique({where:{username}})
@@ -99,7 +99,6 @@ exports.loginPost = [
     
 
     asyncHandler(async(req,res,next)=>{
-        // console.log(req.body);
         const {username,password} = req.body;
         const user = await usernameLoginValidation(username,password)
         const token = generateToken(user.id);

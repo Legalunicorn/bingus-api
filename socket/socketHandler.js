@@ -4,15 +4,15 @@ const prisma = new PrismaClient();
 //Export socket handler into www.js 
 module.exports = (io)=>{
     io.on("connection",(socket)=>{
-        console.log("A user has connected. socket ID: ",socket.id)
+        // console.log("A user has connected. socket ID: ",socket.id)
 
         socket.on("join_DM",(chatId)=>{
-            console.log("Chat ID joined: ",chatId)
+            // console.log("Chat ID joined: ",chatId)
             socket.join(chatId);
         });
 
         socket.on("send message",async({chatId,input,senderId})=>{
-            console.log("=======messsage is sending===========")
+            // console.log("=======messsage is sending===========")
             //sends a message 
             if (input){
                 try{    
@@ -26,7 +26,7 @@ module.exports = (io)=>{
 
                     //emit the message to all users
                     const data = {...message,fromUser:false}; //cannot send message to ownself
-                    console.log("data is: ",data)
+                    // console.log("data is: ",data)
                     socket.broadcast.to(chatId).emit("receive message",data)
 
                     await prisma.chat.update({ 
@@ -38,7 +38,7 @@ module.exports = (io)=>{
                     })
                 } catch(error){
                     //TODO deal with error , maybe emit it back
-                    console.log("Error sending message",error);
+                    // console.log("Error sending message",error);
                 }
             }
 

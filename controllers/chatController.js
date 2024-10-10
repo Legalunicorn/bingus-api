@@ -18,7 +18,7 @@ exports.getChats = asyncHandler(async(req,res,next)=>{
 
     }))
 
-    console.log("chat list is :",chats)
+    // console.log("chat list is :",chats)
 
     res.status(200).json({chats});
 })
@@ -46,7 +46,6 @@ exports.getDM = asyncHandler(async(req,res,next)=>{
             }
         })
     ])
-    console.log("chat hist========",chatHistory)
     //TODO get the username of the other user
     const messages = chatHistory.map(msg=>{
         return {
@@ -55,7 +54,7 @@ exports.getDM = asyncHandler(async(req,res,next)=>{
             
         }
     })
-    console.log(messages)
+    // console.log(messages)
 
     res.status(200).json({messages,otherUser})
 })

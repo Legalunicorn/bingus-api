@@ -13,19 +13,17 @@ exports.getChildComment = asyncHandler(async(req,res,next)=>{
     const id = req.comment.id;
     const cursorId = Number(req.query.cursorId)
 
-    console.log("cursorID",cursorId)
+    // console.log("cursorID",cursorId)
 
     const replies = await (cursorId && cursorId!==-1? 
         get_child_comments(id,req.user.id,cursorId):
         get_child_comments(id,req.user.id))
 
-    // console.log(comments);
     //if comments is null though, i should return an empty cursor
-    // console.log("Sending over: ",replies);
 
     //TODO if cursor
     if (replies.length>0){
-        console.log("sending cid",replies[replies.length-1].id);
+        // console.log("sending cid",replies[replies.length-1].id);
         return res.status(200).json({
             replies,
             cursorId:replies[replies.length-1].id
@@ -34,10 +32,7 @@ exports.getChildComment = asyncHandler(async(req,res,next)=>{
         return res.status(200).json({replies,cursorId:null}); //null -> frontend signals no more replies
     }
 
-    // const myCursor = comments? comments[comments.length-1].id: null;
-    // myCu
-    // return res.status(200).json({comments,myCursor})
-    //implement pagination
+   
 })
 
 
@@ -52,7 +47,7 @@ exports.deleteComment = asyncHandler(async(req,res,next)=>{
             id:true //return id so frontend can clear it off
         }
     })
-    console.log("deleted comment result: ",result)
+    // console.log("deleted comment result: ",result)
     res.status(200).json({comment})
 
     
@@ -140,6 +135,6 @@ exports.postCommentUnlike = asyncHandler(async(req,res,next)=>{
             commentId
         },
     })
-    console.log("deleted:",result)
+    // console.log("deleted:",result)
     res.status(200).json({result})
 })

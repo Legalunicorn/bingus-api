@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 exports.getAllUsers = asyncHandler(async(req,res,next)=>{
     //Add query
     const search = req.query.search;
-    console.log("search is : ",search)
+    // console.log("search is : ",search)
     const currUser = req.user.id
     const users = await (search? get_all_users(currUser,search): get_all_users(currUser));
     //
@@ -55,7 +55,6 @@ exports.getFollowers = [
         const id = Number(req.params.userId);
         const exist = await prisma.user.findUnique({where:{id}});
         if (!exist) return res.status(404).json({error:`UserID ${id} does not exist.`})
-        console.log("getting followers of user: ",id);
         const followers = await get_followers(id);
         res.status(200).json({followers});
     })
@@ -125,25 +124,19 @@ exports.patchProfile = [
             where:{userId:req.user.id}
         })
         //
-        console.log("??",req.body)
         const updateData = {}
-        console.log("this is req.user now",req.user)
         
         if (req.file){
-            console.log(req.file);
             const mimetype = req.file.mimetype.split("/")[0];
             if (mimetype!=='image'){
                 throw new myError("Only image uploads allowed for profilPicture",400);
             }
             //upload new picture
             const result = await uploadStream(req.file.buffer,"bingus_pfp")
-            console.log("======================new pfp status:",result)
-            console.log("")
             //success upload, delete old pfp
 
             if (user_profile.pfp_public_id){ //Delete old profile picteu
                 const deleted = await deleteFile(user_profile.pfp_public_id); //delete this
-                console.log("======================old pfp status: ",deleted)
             }
             updateData.profilePicture = result.secure_url;
             updateData.pfp_public_id = result.public_id;
@@ -226,7 +219,6 @@ exports.followUser = asyncHandler(async(req,res,next)=>{
         }
 
    })
-   console.log("Result of follow",result)
    res.status(200).json({result})
 })
 
@@ -237,6 +229,5 @@ exports.unfollowUser = asyncHandler(async(req,res,next)=>{
             followingId:Number(req.params.userId)
         }
    })
-   console.log("Result of unfollow",result)
    res.status(200).json({result})
 })
