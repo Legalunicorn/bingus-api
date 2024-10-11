@@ -4,7 +4,6 @@ const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 const asyncHandler = require("express-async-handler");
 const myError = require("../lib/myError");
-const {  get_user_basic } = require("../prisma/queries/userQueries");
 
 
 //make sure has u

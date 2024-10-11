@@ -75,7 +75,7 @@ exports.createPost = [
             data.public_id = result.public_id;
         }
         if (req.body.gitLink) data.gitLink = req.body.gitLink
-        if (req.body.repoLink) data.repoLink = req.body.repoLink //TODO remove this.
+        // if (req.body.repoLink) data.repoLink = req.body.repoLink //README removed this,but its still a DB field
         if (req.body.tags.length>0){
             data.tags = {
                 connectOrCreate: req.body.tags.map(name=>({

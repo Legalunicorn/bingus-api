@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function get_child_comments(id,currUserId,myCursor){
     return await prisma.comment.findMany({
 
-        take:4, //TODO change to 5, 3 is for testing
+        take:5, 
         where:{
             parentCommentId:id,
         },

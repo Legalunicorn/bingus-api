@@ -8,15 +8,28 @@ require("dotenv-flow").config()
 const apiRouter = require("./routes/apiRouter")
 //TODO import passportset i think i dont know why i have to
 
+//README deployment
+const compression = require("compression");
+const helmet = require("helmet");
+const RateLimit = require("express-rate-limit")
+
 const app = express();
 
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'jade');
 
+
+const limiter = RateLimit({
+  windowMs: 1*60*1000, // 1 minute
+  max: 50
+})
 /**
  * ======================== MIDDLEWARE ========================
  */
+app.use(compression())
+app.use(helmet());
+app.use(limiter);
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
