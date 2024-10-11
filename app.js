@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require("cors")
 require("dotenv-flow").config()
+// console.log("THE NODE_ENV IS ",process.env.NODE_ENV)
+// console.log("DB URL: ",process.env.DATABASE_URL)
 const apiRouter = require("./routes/apiRouter")
 //TODO import passportset i think i dont know why i have to
 
