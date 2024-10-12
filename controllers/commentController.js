@@ -21,7 +21,6 @@ exports.getChildComment = asyncHandler(async(req,res,next)=>{
 
     //if comments is null though, i should return an empty cursor
 
-    //TODO if cursor
     if (replies.length>0){
         // console.log("sending cid",replies[replies.length-1].id);
         return res.status(200).json({

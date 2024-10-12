@@ -23,6 +23,7 @@ module.exports = (io)=>{
                             chatId:Number(chatId)
                         },
                     })
+                    // console.log("the message is ",message)
 
                     //emit the message to all users
                     const data = {...message,fromUser:false}; //cannot send message to ownself
@@ -45,7 +46,7 @@ module.exports = (io)=>{
         })
 
         socket.on("disconnect",()=>{
-            console.log(socket.id," has disconnected.")
+            // console.log(socket.id," has disconnected.")
         })
     })
 }

@@ -69,11 +69,17 @@ exports.createPost = [
         if (req.file && req.file.mimetype=='raw'){
             throw new myError("Invalid file uploaded",400);
         }
+        
         if (req.file){
+            // console.log("in post controller. the req file is : ",req.file)
             const result = await uploadStream(req.file.buffer,"bingus");
             data.attachment = result.secure_url;
             data.public_id = result.public_id;
+
+            //use RepoLink as a means to store video type LOL
         }
+
+
         if (req.body.gitLink) data.gitLink = req.body.gitLink
         // if (req.body.repoLink) data.repoLink = req.body.repoLink //README removed this,but its still a DB field
         if (req.body.tags.length>0){

@@ -2,13 +2,15 @@
 const {Readable} = require("stream");
 const cloudinary = require("../config/cloudinary")
 
- async function uploadStream(buffer,folder){ //removed type from options, may add if needed
+ async function uploadStream(buffer,folder,isVideo=false){ //removed type from options, may add if needed
     return new Promise((res,rej)=>{
         const transformStream = cloudinary.uploader.upload_stream(
             {
-                folder
+                folder,
+                resource_type: 'auto'
             },
             (err,result)=>{
+                // console.log("This is an error from cloudinary",err)
                 if (err) return rej(err);
                 res(result);
             } 

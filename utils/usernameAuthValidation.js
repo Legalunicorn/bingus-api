@@ -14,8 +14,8 @@ const myError = require("../lib/myError")
                 }
             }
         });
-        console.log(password,"===");
-        if (user) console.log(user.hashedPassword);
+        // console.log(password,"===");
+        // if (user) console.log(user.hashedPassword);
         if (!user || !user.hashedPassword || !bcrypt.compareSync(password,user.hashedPassword)){
             throw new myError("Password or Username is incorrect",401);
         }
@@ -28,7 +28,7 @@ const myError = require("../lib/myError")
  async function  usernameSignupValidation(username,displayName,password){
     //make sure username is unique
     const exist = await prisma.user.findUnique({where:{username}})
-    console.log("Signup EXIST: ",exist);
+    // console.log("Signup EXIST: ",exist);
     if (exist) throw new myError("Username has already been taken",409) //conflict
     const user = await prisma.user.create({
         data:{
@@ -42,7 +42,7 @@ const myError = require("../lib/myError")
             }
         }
     })
-    console.log("= New user created",user)
+    // console.log("= New user created",user)
     return user;
 
 }

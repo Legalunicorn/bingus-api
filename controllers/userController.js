@@ -125,17 +125,20 @@ exports.patchProfile = [
             include:{user:true}
         })
         //if user is the guest we reject this 
-        console.log(user_profile,'--');
         if (user_profile.user.username==='GuestUser' && req.body.username!=='GuestUser'){
             throw new myError("Guest user is not allowed to change usernames",400);
         }
-        // console.log("AM I TROLLING",user_profile.user.username,req.body.username)
         const updateData = {}
         
         if (req.file){
             const mimetype = req.file.mimetype.split("/")[0];
+            // console.log("req file is...",req.file)
             if (mimetype!=='image'){
                 throw new myError("Only image uploads allowed for profilPicture",400);
+            }
+
+            if (req.file.size>(1024*1024*8)){
+                throw new myError("File size exced 8mb",400);
             }
             //upload new picture
             const result = await uploadStream(req.file.buffer,"bingus_pfp")
@@ -201,14 +204,7 @@ exports.deleteUser = asyncHandler(async(req,res,next)=>{
 })
 
 exports.followUser = asyncHandler(async(req,res,next)=>{
-    /*
-    should follow and unfollow be seperate endpoints?
 
-    1. we search from Follow Table to check if the record exit
-    2. if the record exist, im not sure to throw an error or not. i guess not 
-    To avoid throwing an Error, use deleteMany()
-
-    */
    const result = await prisma.follow.upsert({
         where:{
             id:{
