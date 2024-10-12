@@ -121,9 +121,15 @@ exports.patchProfile = [
 
         //This is the only route we need the pfp_public_id so we should just retreive it 
         const user_profile = await prisma.profile.findUnique({
-            where:{userId:req.user.id}
+            where:{userId:req.user.id},
+            include:{user:true}
         })
-        //
+        //if user is the guest we reject this 
+        console.log(user_profile,'--');
+        if (user_profile.user.username==='GuestUser' && req.body.username!=='GuestUser'){
+            throw new myError("Guest user is not allowed to change usernames",400);
+        }
+        // console.log("AM I TROLLING",user_profile.user.username,req.body.username)
         const updateData = {}
         
         if (req.file){
