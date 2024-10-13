@@ -17,10 +17,10 @@ router.get("/:commentId",
 
 
 
-router.delete("/:commentId", //What is the point of this?
-    ownCommentAuth,
-    controller.deleteComment
-)
+// router.delete("/:commentId", //What is the point of this?
+//     ownCommentAuth,
+//     controller.deleteComment
+// )
 
 router.post("/",
     requireAuth,
