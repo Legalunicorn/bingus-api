@@ -1,12 +1,12 @@
 <h1 align="center">Bingus API</h1>
 
 Backend for [Bingus repo](https://github.come/Legalunicorn/bingus)
+
 Demo for bingus [Live](https://wwww.bingus-production.up.railway.app)
 
 ## Built with
 - ExpressJS 
 - Postgresql
-- 
 
 ## Tools 
 - **Cloudinary** : cloud based media management service 
@@ -15,7 +15,8 @@ Demo for bingus [Live](https://wwww.bingus-production.up.railway.app)
 
 ## Development 
 Here are the steps to start the project locally.
-Prerequisites.
+
+Prerequisites:
 - Installed psql 
 - Installed npm
 
@@ -92,7 +93,9 @@ $ npm run serverstart
 ### [Optionally] 8. clone the frontend repo and run it
 If you wish to use the UI, head over to the [Bingus frontend repo](https://github.come/Legalunicorn/bingus) and follow the instructions to run it.
 
-Otherwise you can use a service like [Postman](www.postman.com) to test and build the API
+Otherwise you can use a service like [Postman](www.postman.com) to test and build the API.
+
+If I've missed a step or something please create an issue or contact me at nyeo700@gmail.com
 
 
 
@@ -103,9 +106,8 @@ Otherwise you can use a service like [Postman](www.postman.com) to test and buil
 ![erd](/public/images/ERD.png)
 
 ## features todo
-- Implement Access and Refresh Tokens with JWT
-- Integrate notifications model for messages, likes, comments
-- Add socket.io for live messages between users 
+- Implement Access and Refresh Tokens with JWT (currently just basic JWT)
+- Integrate notifications model for messages, likes, comments (currenot no notifications modal used or made)
 
 ## API Check list
 #### Auth
@@ -162,3 +164,9 @@ Otherwise you can use a service like [Postman](www.postman.com) to test and buil
 
 #### Init  
 - [x] `/init` __GET__
+
+
+
+Note: Some endpoints I did not end up using have not been used yet, will refine them when I have time. Same goes for certain Prisma model fields I ended up not using.
+
+There are also some insistensies in the way i throw errors, but the have the same results. such as using `res.status(400).json()` vs throwing my own custom error with 	`throw new myError`
