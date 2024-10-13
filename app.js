@@ -57,10 +57,11 @@ app.use(function(req, res, next) {
 });
 
 app.use((err,req,res,next)=>{
-  console.log(`$Error: ${err.message} ${err.status || 'no status'}`)
-  console.log();
-  console.log("======== ERR STACK ========")
-  console.log(err.stack);
+  //README uncomment for dev
+  // console.log(`$Error: ${err.message} ${err.status || 'no status'}`)
+  // console.log();
+  // console.log("======== ERR STACK ========")
+  // console.log(err.stack);
   
   res.header("Content-Type","application/json")
   res.status(err.status || 400).json({error:err.message} || 'Something went wrong.')
