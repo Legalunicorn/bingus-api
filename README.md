@@ -1,8 +1,8 @@
 <h1 align="center">Bingus API</h1>
 
-Backend for [Bingus repo](https://github.come/Legalunicorn/bingus)
+Backend for [Bingus repo](https://github.com/Legalunicorn/bingus)
 
-Demo for bingus [Live](https://wwww.bingus-production.up.railway.app)
+Demo for bingus [Live](https://bingus-production.up.railway.app)
 
 ## Built with
 - ExpressJS 
@@ -52,7 +52,7 @@ Also head over to `/controllsers/authControllers/js` and comment out two functio
 
 `exports.googleGet` and `exports.googleRedirectGet`
 
-### 4. Create a [Cloudinary account](www.cloudinary.com) 
+### 4. Create a [Cloudinary account](https://www.cloudinary.com) 
 This will give you access the following:
 - CLOUDINARY_API_NAME
 - CLOUDINARY_API_KEY
@@ -90,10 +90,10 @@ $ npm run serverstart
 ```
 
 
-### [Optionally] 8. clone the frontend repo and run it
-If you wish to use the UI, head over to the [Bingus frontend repo](https://github.come/Legalunicorn/bingus) and follow the instructions to run it.
+### [Optional] 8. clone the frontend repo and run it
+If you wish to use the UI, head over to the [Bingus frontend repo](https://github.com/Legalunicorn/bingus) and follow the instructions to run it.
 
-Otherwise you can use a service like [Postman](www.postman.com) to test and build the API.
+Otherwise you can use a service like [Postman](https://www.postman.com) to test and build the API.
 
 If I've missed a step or something please create an issue or contact me at nyeo700@gmail.com
 
