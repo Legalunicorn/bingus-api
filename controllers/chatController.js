@@ -42,7 +42,8 @@ exports.getDM = asyncHandler(async(req,res,next)=>{
         prisma.user.findUnique({
             where:{id:otherUserId},
             select:{
-                username:true
+                username:true,
+                id:true
             }
         })
     ])
