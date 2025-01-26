@@ -2,7 +2,7 @@
 
 Backend for [Bingus repo](https://github.com/Legalunicorn/bingus)
 
-Demo for bingus [Live](https://bingus-production.up.railway.app)
+Demo for bingus [Live](https://bingus.hiroc.vip)
 
 ## Built with
 - ExpressJS 

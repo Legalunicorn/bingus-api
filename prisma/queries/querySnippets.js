@@ -19,14 +19,6 @@
     item = 
     {
         ...SELECT_USER_BASIC,
-        // _count:{
-        //         select:{
-        //             followers:{
-        //                 where:{followerId:userId}
-        //                 }
-        //             }
-        //         }
-        
         followers:{
             where:{
                 followerId:userId
